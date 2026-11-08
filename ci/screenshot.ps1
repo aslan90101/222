@@ -53,6 +53,9 @@ function Shot($name) {
   Write-Host "shot $name"
 }
 Shot "shot-1-main-ru.png"
+Write-Host "---- app log after boot ----"
+$logPath0 = Join-Path (Split-Path $full -Parent) "data\endorvpn.log"
+if (Test-Path $logPath0) { Get-Content $logPath0 | Select-Object -Last 25 | ForEach-Object { Write-Host $_ } }
 # switch to EN (top-right language segmented control)
 [WinApi]::Click(($rect.Right - 106), ($rect.Top + 27))
 Start-Sleep -Milliseconds 900
@@ -68,4 +71,14 @@ Start-Sleep -Milliseconds 700
 [WinApi]::Click(($rect.Left + 200), ($rect.Top + 330))
 Start-Sleep -Milliseconds 800
 Shot "shot-4-country-selected.png"
+
+# connect flow
+[WinApi]::Click(($rect.Left + [int](($rect.Right - $rect.Left) / 2)), ($rect.Top + 150))
+Start-Sleep -Seconds 3
+Shot "shot-5-connecting.png"
+Start-Sleep -Seconds 22
+Shot "shot-6-connected.png"
+Write-Host "---- app log after connect ----"
+$logPath = Join-Path (Split-Path $full -Parent) "data\endorvpn.log"
+if (Test-Path $logPath) { Copy-Item $logPath (Join-Path $OutDir "ui-app.log") -Force; Get-Content $logPath | Select-Object -Last 45 | ForEach-Object { Write-Host $_ } }
 if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force }

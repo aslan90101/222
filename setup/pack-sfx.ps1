@@ -43,6 +43,18 @@ try {
 } finally { $fs.Dispose() }
 Remove-Item $zipPath -Force
 
+# verify the exact layout the stub expects: [zip][marker][int64 length]
+$all = [System.IO.File]::ReadAllBytes($outFull)
+$zipLen = [System.BitConverter]::ToInt64($all, $all.Length - 8)
+$markerAt = $all.Length - 8 - $marker.Length
+$zipStart = $markerAt - $zipLen
+$markerOk = ([System.Text.Encoding]::ASCII.GetString($all, $markerAt, $marker.Length) -eq "ENDORVPN_PAYLOAD_V1")
+$zipOk = ($all[$zipStart] -eq 0x50 -and $all[$zipStart + 1] -eq 0x4B)
+if (-not $markerOk) { throw "SFX self-check failed: marker mismatch" }
+if (-not $zipOk) { throw "SFX self-check failed: payload is not a zip" }
+if ($zipLen -ne $zipBytes.Length) { throw "SFX self-check failed: length mismatch" }
+Write-Host "self-check: marker ok, zip ok, payload $([math]::Round($zipLen/1MB,2)) MB"
+
 Write-Host "stub   : $([math]::Round($stubBytes.Length/1MB,2)) MB"
 Write-Host "payload: $([math]::Round($zipBytes.Length/1MB,2)) MB"
 Write-Host "single : $([math]::Round((Get-Item $outFull).Length/1MB,2)) MB -> $outFull"

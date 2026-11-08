@@ -113,6 +113,20 @@ jobs:
           ./setup/pack-sfx.ps1 -Stub setup\bin\x64\Release\net48\EndorVPN-Setup.exe -AppDir dist\EndorVPN -Out dist\EndorVPN.exe
           if (-not (Test-Path dist\EndorVPN.exe)) { throw "single-file build failed" }
           Write-Host "single exe: $([math]::Round((Get-Item dist\EndorVPN.exe).Length/1MB,2)) MB"
+
+          # Smoke-test the real distributable: run it and expect it to unpack and
+          # launch the UI. This is the exact file users download.
+          $installDir = Join-Path $env:LOCALAPPDATA "EndorVPN"
+          if (Test-Path $installDir) { Remove-Item $installDir -Recurse -Force -ErrorAction SilentlyContinue }
+          $p = Start-Process dist\EndorVPN.exe -PassThru
+          $deadline = (Get-Date).AddSeconds(60)
+          while ((Get-Date) -lt $deadline -and -not (Test-Path (Join-Path $installDir "payload.version"))) { Start-Sleep -Milliseconds 500 }
+          $unpacked = Test-Path (Join-Path $installDir "EndorVPN.exe")
+          $engineOk = Test-Path (Join-Path $installDir "engine\openvpn.exe")
+          Write-Host "sfx unpack: exe=$unpacked engine=$engineOk"
+          Get-Process EndorVPN, 'EndorVPN-Setup' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          if (-not $unpacked -or -not $engineOk) { throw "single-file exe failed to unpack" }
+          Remove-Item $installDir -Recurse -Force -ErrorAction SilentlyContinue
           Get-ChildItem dist -Filter *.exe | Format-Table Name,Length
           Stop-Transcript | Out-Null
 

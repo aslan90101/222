@@ -93,15 +93,19 @@ namespace EndorVpnSetup
             byte[] marker = Encoding.ASCII.GetBytes(PayloadMarker);
 
             long length = BitConverter.ToInt64(all, all.Length - 8);
-            long start = all.Length - 8 - length;
+            // Layout at the tail: [zip][marker][int64 length][EOF]
+            long markerStart = all.Length - 8 - marker.Length;
+            long start = markerStart - length;
             if (start < 0 || length <= 0) throw new InvalidOperationException("installer payload is corrupted");
 
-            // the marker sits exactly between the zip and the length field
             for (int j = 0; j < marker.Length; j++)
             {
-                if (all[start + length + j] != marker[j])
+                if (all[markerStart + j] != marker[j])
                     throw new InvalidOperationException("installer payload offset mismatch");
             }
+            // a zip payload always starts with a local file header
+            if (length < 4 || all[start] != 0x50 || all[start + 1] != 0x4B)
+                throw new InvalidOperationException("installer payload is not a zip archive");
 
             var payload = new byte[length];
             Buffer.BlockCopy(all, (int)start, payload, 0, (int)length);

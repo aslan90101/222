@@ -560,16 +560,44 @@ namespace EndorVPN
 
         private void RenderCountries()
         {
+            try
+            {
+                RenderCountriesCore();
+            }
+            catch (Exception ex)
+            {
+                Program.Log.Error("render failed: " + ex.GetType().Name + ": " + ex.Message + " | " + (ex.StackTrace ?? "").Split('\n')[0]);
+            }
+        }
+
+        private void RenderCountriesCore()
+        {
+            Program.Log.Info("render: begin");
             CountryList.Children.Clear();
             if (_book.Servers.Count == 0) { UpdateServerBadge(); return; }
 
             List<ServerBook.Country> favorites;
             var ranking = _book.Ranking(_filter, _search, out favorites);
+            Program.Log.Info("render: ranking " + ranking.Count);
             bool hasFav = _book.Countries.Values.Any(c => c.IsFavorite);
             if (_filter == "favorite" && !hasFav) ranking = new List<ServerBook.Country>();
 
             CountryList.Children.Add(BuildTabHeader(ranking.Count));
-            foreach (var c in ranking) CountryList.Children.Add(BuildCountryRow(c));
+            int rowNo = 0;
+            foreach (var c in ranking)
+            {
+                try
+                {
+                    CountryList.Children.Add(BuildCountryRow(c));
+                }
+                catch (Exception ex)
+                {
+                    Program.Log.Error("row failed for " + c.Code + ": " + ex.GetType().Name + ": " + ex.Message);
+                }
+                rowNo++;
+                if (rowNo % 5 == 0) Program.Log.Info("render: rows " + rowNo + "/" + ranking.Count);
+            }
+            Program.Log.Info("render: rows built " + CountryList.Children.Count);
 
             Program.Log.Info("render: servers=" + _book.Servers.Count + " ranking=" + ranking.Count + " filter=" + _filter + " search='" + _search + "'");
             if (ranking.Count > 0) MarkUiReady();

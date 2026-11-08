@@ -1,4 +1,3 @@
-using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -736,8 +735,8 @@ namespace EndorVPN
         {
             try
             {
-                if (Directory.Exists(Program.Paths.DataDir))
-                    File.WriteAllText(Path.Combine(Program.Paths.DataDir, "ui-ready.txt"), DateTime.Now.ToString("O"));
+                if (System.IO.Directory.Exists(Program.Paths.DataDir))
+                    System.IO.File.WriteAllText(System.IO.Path.Combine(Program.Paths.DataDir, "ui-ready.txt"), DateTime.Now.ToString("O"));
             }
             catch { }
         }

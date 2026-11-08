@@ -1,12 +1,12 @@
 **********************
 PowerShell transcript start
-Start time: 20261108220430
+Start time: 20261108221042
 Username: runnervmm7ud1\runneradmin
 RunAs User: runnervmm7ud1\runneradmin
 Configuration Name: 
 Machine: runnervmm7ud1 (Microsoft Windows NT 10.0.26100.0)
-Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\c5746dca-9322-4109-ba6a-50db9780fdb1.ps1'
-Process ID: 2312
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\cea2beaa-a385-4898-94c4-f35da0c4c77d.ps1'
+Process ID: 4548
 PSVersion: 7.6.9
 PSEdition: Core
 GitCommitId: 7.6.9
@@ -17,18 +17,35 @@ PSRemotingProtocolVersion: 2.4
 SerializationVersion: 1.1.0.1
 WSManStackVersion: 3.0
 **********************
+D:\a\222\222\setup\Setup.csproj(24,5): error MSB4232: Items that are outside Target elements must have one of the following operations: Include, Update, or Remove.
 
+Build FAILED.
+
+D:\a\222\222\setup\Setup.csproj(24,5): error MSB4232: Items that are outside Target elements must have one of the following operations: Include, Update, or Remove.
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.07
+D:\a\222\222\setup\Setup.csproj(24,5): error MSB4232: Items that are outside Target elements must have one of the following operations: Include, Update, or Remove.
+
+Build FAILED.
+
+D:\a\222\222\setup\Setup.csproj(24,5): error MSB4232: Items that are outside Target elements must have one of the following operations: Include, Update, or Remove.
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.07
 PS>TerminatingError(): "stub build failed"
 >> TerminatingError(): "stub build failed"
-Exception: D:\a\_temp\c5746dca-9322-4109-ba6a-50db9780fdb1.ps1:7
+Exception: D:\a\_temp\cea2beaa-a385-4898-94c4-f35da0c4c77d.ps1:9
 Line |
-   7 |  if ($LASTEXITCODE -ne 0) { throw "stub build failed" }
-     |                             ~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |    throw "stub build failed"
+     |    ~~~~~~~~~~~~~~~~~~~~~~~~~
      | stub build failed
 
 PS>$global:?
 False
 **********************
 PowerShell transcript end
-End time: 20261108220432
+End time: 20261108221045
 **********************

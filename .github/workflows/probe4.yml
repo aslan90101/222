@@ -2,7 +2,7 @@ name: probe4
 on:
   push:
     branches: [arena/72bfde82-222]
-    paths: ['ci/probe11.ps1', '.github/workflows/probe4.yml']
+    paths: ['ci/probe12.ps1', '.github/workflows/probe4.yml']
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,11 +14,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: run probe
         shell: pwsh
-        run: ./ci/probe11.ps1
+        run: ./ci/probe12.ps1
         continue-on-error: true
       - name: push report
         shell: pwsh
         run: |
           git config user.email "ci@endorvpn.local"; git config user.name "EndorVPN CI"
-          git add -A ci/reports; git commit -m "ci: probe11 report" | Out-Null
+          git add -A ci/reports; git commit -m "ci: probe12 report" | Out-Null
           git pull --rebase origin arena/72bfde82-222; git push origin HEAD:arena/72bfde82-222

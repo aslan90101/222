@@ -1,98 +1,84 @@
-﻿2026-11-08 22:07:23.312 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
-2026-11-08 22:07:23.594 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
-2026-11-08 22:07:23.597 [INFO] parsed 19 servers
-2026-11-08 22:07:23.706 [INFO] server book: 19 servers in 10 countries
-2026-11-08 22:07:23.764 [INFO] server cache saved, 23 chars
-2026-11-08 22:07:23.770 [INFO] smoke exit 0
-2026-11-08 22:07:24.567 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
-2026-11-08 22:07:24.664 [INFO] ip 172.184.210.209 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-08 22:07:24.664 [INFO] e2e ip before: 172.184.210.209
-2026-11-08 22:07:25.302 [INFO] vpnbook credentials parsed
-2026-11-08 22:07:26.192 [INFO] vpnbook servers: 20
-2026-11-08 22:07:26.546 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 344 ms, 1279813 chars
-2026-11-08 22:07:26.556 [INFO] parsed 95 servers
-2026-11-08 22:07:26.560 [INFO] e2e candidates: 26
-2026-11-08 22:07:26.560 [INFO] e2e trying us16.vpnbook.com (US, vpnbook)
-2026-11-08 22:07:26.603 [INFO] running TAP installer
-2026-11-08 22:07:27.638 [INFO] server list from http://www.vpngate.net/api/iphone/ in 1437 ms, 1252935 chars
-2026-11-08 22:07:27.647 [INFO] parsed 93 servers
-2026-11-08 22:07:31.416 [INFO] server list from https://www.vpngate.net/api/iphone/ in 5215 ms, 1252935 chars
-2026-11-08 22:07:31.423 [INFO] parsed 93 servers
-2026-11-08 22:07:32.284 [INFO] attempt 1: us16.vpnbook.com (US)
-2026-11-08 22:07:32.296 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-08 22:07:32.296 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-08 22:07:32.296 [INFO] config preview: # EndorVPN profile for us16.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto tcp / remote us16.vpnbook.com 443 / remote us16.vpnbook.com 1194 / remote-random / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outs
-2026-11-08 22:07:50.455 [WARN] server failed: us16.vpnbook.com -> 
-2026-11-08 22:07:50.857 [INFO] e2e trying us178.vpnbook.com (US, vpnbook)
-2026-11-08 22:07:50.881 [INFO] TAP adapter already present
-2026-11-08 22:07:50.881 [INFO] attempt 1: us178.vpnbook.com (US)
-2026-11-08 22:07:50.889 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-08 22:07:50.891 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-08 22:07:50.891 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto tcp / remote us178.vpnbook.com 443 / remote us178.vpnbook.com 1194 / remote-random / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-o
-2026-11-08 22:07:57.692 [INFO] ip 147.135.37.178 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-08 22:07:57.692 [INFO] tunnel up via us178.vpnbook.com, exit ip 147.135.37.178
-2026-11-08 22:07:57.694 [INFO] e2e result: {"stage":"start","ipBefore":"172.184.210.209","ipAfter":"147.135.37.178","server":"us178.vpnbook.com","country":"US","provider":"vpnbook","connected":true,"ipChanged":true,"done":true}
-2026-11-08 22:08:00.805 [INFO] disconnected
-2026-11-08 22:08:00.901 [INFO] e2e exit 0
-2026-11-08 22:08:21.257 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
-2026-11-08 22:08:23.286 [INFO] render: begin
-2026-11-08 22:08:23.466 [INFO] ip 172.184.210.209 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-08 22:08:23.617 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 210 ms, 1279813 chars
-2026-11-08 22:08:23.633 [INFO] parsed 95 servers
-2026-11-08 22:08:23.758 [INFO] vpnbook credentials parsed
-2026-11-08 22:08:24.624 [INFO] vpnbook servers: 20
-2026-11-08 22:08:24.626 [INFO] merged providers: 105 servers
-2026-11-08 22:08:24.630 [INFO] server book: 105 servers in 16 countries
-2026-11-08 22:08:24.634 [INFO] server list from http://www.vpngate.net/api/iphone/ in 1221 ms, 1252958 chars
-2026-11-08 22:08:24.642 [INFO] default country: US
-2026-11-08 22:08:24.642 [INFO] parsed 93 servers
-2026-11-08 22:08:24.668 [INFO] server cache saved, 1344823 chars
-2026-11-08 22:08:24.668 [INFO] render: begin
-2026-11-08 22:08:24.672 [INFO] render: ranking 16
-2026-11-08 22:08:24.720 [INFO] render: rows 5/16
-2026-11-08 22:08:24.721 [INFO] render: rows 10/16
-2026-11-08 22:08:24.724 [INFO] render: rows 15/16
-2026-11-08 22:08:24.726 [INFO] render: rows built 17
-2026-11-08 22:08:24.726 [INFO] render: servers=105 ranking=16 filter=all search=''
-2026-11-08 22:08:24.741 [INFO] server list from https://www.vpngate.net/api/iphone/ in 1335 ms, 1252958 chars
-2026-11-08 22:08:24.757 [INFO] parsed 93 servers
-2026-11-08 22:08:34.342 [INFO] connecting to US with 4 ranked candidates
-2026-11-08 22:08:34.379 [INFO] TAP adapter already present
-2026-11-08 22:08:34.381 [INFO] attempt 1: us178.vpnbook.com (US)
-2026-11-08 22:08:34.397 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-08 22:08:34.398 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-08 22:08:34.398 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us178.vpnbook.com 443 / remote us178.vpnbook.com 1194 / remote-random / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-o
-2026-11-08 22:08:35.592 [INFO] render: begin
-2026-11-08 22:08:35.593 [INFO] latency measured for 32 servers
-2026-11-08 22:08:35.597 [INFO] render: ranking 16
-2026-11-08 22:08:35.600 [INFO] render: rows 5/16
-2026-11-08 22:08:35.602 [INFO] render: rows 10/16
-2026-11-08 22:08:35.605 [INFO] render: rows 15/16
-2026-11-08 22:08:35.605 [INFO] render: rows built 17
-2026-11-08 22:08:35.605 [INFO] render: servers=105 ranking=16 filter=all search=''
-2026-11-08 22:08:35.606 [INFO] render: begin
-2026-11-08 22:08:35.609 [INFO] render: ranking 16
-2026-11-08 22:08:35.612 [INFO] render: rows 5/16
-2026-11-08 22:08:35.615 [INFO] render: rows 10/16
-2026-11-08 22:08:35.617 [INFO] render: rows 15/16
-2026-11-08 22:08:35.618 [INFO] render: rows built 17
-2026-11-08 22:08:35.618 [INFO] render: servers=105 ranking=16 filter=all search=''
-2026-11-08 22:08:35.618 [INFO] latency probe finished
-2026-11-08 22:08:52.795 [WARN] server failed: us178.vpnbook.com -> 
-2026-11-08 22:08:52.795 [INFO] attempt 2: us16.vpnbook.com (US)
-2026-11-08 22:08:52.797 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-08 22:08:52.797 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-08 22:08:52.798 [INFO] config preview: # EndorVPN profile for us16.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto tcp / remote us16.vpnbook.com 443 / remote us16.vpnbook.com 1194 / remote-random / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outs
-2026-11-08 22:09:11.207 [WARN] server failed: us16.vpnbook.com -> 
-2026-11-08 22:09:11.208 [INFO] attempt 3: vpn867124808 (US)
-2026-11-08 22:09:11.210 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-08 22:09:11.210 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-08 22:09:11.210 [INFO] config preview: # EndorVPN profile for vpn867124808 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto tcp / remote 38.42.34.70 443 / remote 38.42.34.70 1194 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outside-dns / redirect-gateway def1 bypass-dhcp / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAIIQz7DS
-2026-11-08 22:09:29.478 [WARN] server failed: vpn867124808 -> 
-2026-11-08 22:09:29.482 [INFO] fallback to vpngate vpn867124808
-2026-11-08 22:09:29.602 [INFO] TAP adapter already present
-2026-11-08 22:09:29.603 [INFO] attempt 1: vpn867124808 (US)
-2026-11-08 22:09:29.604 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-08 22:09:29.604 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-08 22:09:29.604 [INFO] config preview: # EndorVPN profile for vpn867124808 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto tcp / remote 38.42.34.70 443 / remote 38.42.34.70 1194 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outside-dns / redirect-gateway def1 bypass-dhcp / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAIIQz7DS
-2026-11-08 22:09:47.992 [WARN] server failed: vpn867124808 -> 
+﻿2026-11-08 22:13:45.383 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
+2026-11-08 22:13:45.650 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
+2026-11-08 22:13:45.653 [INFO] parsed 19 servers
+2026-11-08 22:13:45.762 [INFO] server book: 19 servers in 10 countries
+2026-11-08 22:13:45.821 [INFO] server cache saved, 23 chars
+2026-11-08 22:13:45.827 [INFO] smoke exit 0
+2026-11-08 22:13:46.446 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
+2026-11-08 22:13:46.529 [INFO] ip 52.233.94.80 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-08 22:13:46.529 [INFO] e2e ip before: 52.233.94.80
+2026-11-08 22:13:47.032 [INFO] vpnbook credentials parsed
+2026-11-08 22:13:48.020 [INFO] vpnbook servers: 20
+2026-11-08 22:13:48.295 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 264 ms, 1333713 chars
+2026-11-08 22:13:48.303 [INFO] parsed 99 servers
+2026-11-08 22:13:48.307 [INFO] e2e candidates: 26
+2026-11-08 22:13:48.307 [INFO] e2e trying us16.vpnbook.com (US, vpnbook)
+2026-11-08 22:13:48.342 [INFO] running TAP installer
+2026-11-08 22:13:49.495 [INFO] server list from http://www.vpngate.net/api/iphone/ in 1464 ms, 1293537 chars
+2026-11-08 22:13:49.501 [INFO] parsed 96 servers
+2026-11-08 22:13:50.707 [INFO] server list from https://www.vpngate.net/api/iphone/ in 2676 ms, 1293537 chars
+2026-11-08 22:13:50.713 [INFO] parsed 96 servers
+2026-11-08 22:13:53.514 [INFO] attempt 1: us16.vpnbook.com (US)
+2026-11-08 22:13:53.524 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-08 22:13:53.524 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-08 22:13:53.524 [INFO] config preview: # EndorVPN profile for us16.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto tcp / remote us16.vpnbook.com 443 / remote us16.vpnbook.com 1194 / remote-random / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outs
+2026-11-08 22:14:04.358 [INFO] ip 147.135.15.16 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-08 22:14:04.358 [INFO] tunnel up via us16.vpnbook.com, exit ip 147.135.15.16
+2026-11-08 22:14:04.359 [INFO] e2e result: {"stage":"start","ipBefore":"52.233.94.80","ipAfter":"147.135.15.16","server":"us16.vpnbook.com","country":"US","provider":"vpnbook","connected":true,"ipChanged":true,"done":true}
+2026-11-08 22:14:07.458 [INFO] disconnected
+2026-11-08 22:14:07.524 [INFO] e2e exit 0
+2026-11-08 22:14:26.493 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
+2026-11-08 22:14:28.351 [INFO] render: begin
+2026-11-08 22:14:28.492 [INFO] ip 52.233.94.80 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-08 22:14:28.570 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 110 ms, 1333713 chars
+2026-11-08 22:14:28.593 [INFO] parsed 99 servers
+2026-11-08 22:14:28.996 [INFO] vpnbook credentials parsed
+2026-11-08 22:14:29.912 [INFO] vpnbook servers: 20
+2026-11-08 22:14:29.914 [INFO] merged providers: 109 servers
+2026-11-08 22:14:29.917 [INFO] server book: 109 servers in 16 countries
+2026-11-08 22:14:29.923 [INFO] default country: US
+2026-11-08 22:14:29.943 [INFO] server cache saved, 1398991 chars
+2026-11-08 22:14:29.943 [INFO] render: begin
+2026-11-08 22:14:29.947 [INFO] render: ranking 16
+2026-11-08 22:14:29.989 [INFO] render: rows 5/16
+2026-11-08 22:14:29.992 [INFO] render: rows 10/16
+2026-11-08 22:14:29.993 [INFO] render: rows 15/16
+2026-11-08 22:14:29.994 [INFO] render: rows built 17
+2026-11-08 22:14:29.995 [INFO] render: servers=109 ranking=16 filter=all search=''
+2026-11-08 22:14:30.269 [INFO] server list from http://www.vpngate.net/api/iphone/ in 1799 ms, 1293537 chars
+2026-11-08 22:14:30.307 [INFO] parsed 96 servers
+2026-11-08 22:14:34.401 [INFO] server list from https://www.vpngate.net/api/iphone/ in 5942 ms, 1293537 chars
+2026-11-08 22:14:34.423 [INFO] parsed 96 servers
+2026-11-08 22:14:40.110 [INFO] connecting to US with 4 ranked candidates
+2026-11-08 22:14:40.160 [INFO] TAP adapter already present
+2026-11-08 22:14:40.161 [INFO] attempt 1: us178.vpnbook.com (US)
+2026-11-08 22:14:40.174 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-08 22:14:40.176 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-08 22:14:40.176 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us178.vpnbook.com 443 / remote us178.vpnbook.com 1194 / remote-random / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-o
+2026-11-08 22:14:42.702 [INFO] latency measured for 33 servers
+2026-11-08 22:14:42.703 [INFO] render: begin
+2026-11-08 22:14:42.706 [INFO] render: ranking 16
+2026-11-08 22:14:42.708 [INFO] render: rows 5/16
+2026-11-08 22:14:42.709 [INFO] render: rows 10/16
+2026-11-08 22:14:42.710 [INFO] render: rows 15/16
+2026-11-08 22:14:42.711 [INFO] render: rows built 17
+2026-11-08 22:14:42.711 [INFO] render: servers=109 ranking=16 filter=all search=''
+2026-11-08 22:14:42.711 [INFO] latency probe finished
+2026-11-08 22:14:58.494 [WARN] server failed: us178.vpnbook.com -> 
+2026-11-08 22:14:58.495 [INFO] attempt 2: us16.vpnbook.com (US)
+2026-11-08 22:14:58.496 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-08 22:14:58.496 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-08 22:14:58.497 [INFO] config preview: # EndorVPN profile for us16.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us16.vpnbook.com 443 / remote us16.vpnbook.com 1194 / remote-random / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outs
+2026-11-08 22:15:16.860 [WARN] server failed: us16.vpnbook.com -> 
+2026-11-08 22:15:16.863 [INFO] attempt 3: vpn403877961 (US)
+2026-11-08 22:15:16.864 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-08 22:15:16.864 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-08 22:15:16.864 [INFO] config preview: # EndorVPN profile for vpn403877961 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote 104.28.198.243 443 / remote 104.28.198.243 1194 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outside-dns / redirect-gateway def1 bypass-dhcp / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAI
+2026-11-08 22:15:35.206 [WARN] server failed: vpn403877961 -> 
+2026-11-08 22:15:35.210 [INFO] fallback to vpngate vpn403877961
+2026-11-08 22:15:35.271 [INFO] TAP adapter already present
+2026-11-08 22:15:35.272 [INFO] attempt 1: vpn403877961 (US)
+2026-11-08 22:15:35.273 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-08 22:15:35.273 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-08 22:15:35.273 [INFO] config preview: # EndorVPN profile for vpn403877961 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 1 / connect-retry-max 1 / connect-timeout 20 / tun-mtu 1450 / mssfix 1380 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote 104.28.198.243 443 / remote 104.28.198.243 1194 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / dhcp-option DNS 1.1.1.1 / dhcp-option DNS 8.8.8.8 / block-outside-dns / redirect-gateway def1 bypass-dhcp / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAI
+2026-11-08 22:15:53.629 [WARN] server failed: vpn403877961 -> 

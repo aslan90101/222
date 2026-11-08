@@ -30,10 +30,10 @@ PASS admin
 PASS json.escape
 
 ---- log ----
-2026-11-08 22:07:23.312 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
-2026-11-08 22:07:23.594 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
-2026-11-08 22:07:23.597 [INFO] parsed 19 servers
-2026-11-08 22:07:23.706 [INFO] server book: 19 servers in 10 countries
-2026-11-08 22:07:23.764 [INFO] server cache saved, 23 chars
-2026-11-08 22:07:23.770 [INFO] smoke exit 0
+2026-11-08 22:13:45.383 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
+2026-11-08 22:13:45.650 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
+2026-11-08 22:13:45.653 [INFO] parsed 19 servers
+2026-11-08 22:13:45.762 [INFO] server book: 19 servers in 10 countries
+2026-11-08 22:13:45.821 [INFO] server cache saved, 23 chars
+2026-11-08 22:13:45.827 [INFO] smoke exit 0
 

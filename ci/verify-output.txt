@@ -1,0 +1,13 @@
+missing: liblzo2-2.dll
+libcrypto-3-x64.dll
+libopenvpn_plap.dll
+libpkcs11-helper-1.dll
+libssl-3-x64.dll
+openssl.exe
+openvpn-gui.exe
+openvpn.exe
+openvpnserv.exe
+openvpnserv2.exe
+tapctl.exe
+vcruntime140.dll
+tap-windows-installer.exe

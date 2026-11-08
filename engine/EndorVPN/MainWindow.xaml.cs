@@ -480,6 +480,7 @@ namespace EndorVPN
             try
             {
                 var alternatives = OrderServers(country);
+                Program.Log.Info("connecting to " + country + " with " + alternatives.Count + " ranked candidates");
                 var result = await _engine.ConnectAsync(server, _settings, alternatives, _opCts.Token);
                 if (!result.Ok)
                 {

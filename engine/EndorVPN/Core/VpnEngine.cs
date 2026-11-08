@@ -65,6 +65,12 @@ namespace EndorVPN.Core
 
         public TapManager Tap { get { return _tap; } }
 
+        /// <summary>How long a single server gets to come up before we move on.</summary>
+        public int AttemptTimeoutSec = 30;
+
+        /// <summary>Hard cap on attempts in one ConnectAsync call.</summary>
+        public int MaxAttempts = 4;
+
         public async Task<ConnectResult> ConnectAsync(VpnServer server, AppSettings settings, IList<VpnServer> alternatives, CancellationToken ct)
         {
             lock (_sync)
@@ -99,10 +105,13 @@ namespace EndorVPN.Core
                     }
                 }
 
+                int attempt = 0;
                 foreach (var candidate in candidates)
                 {
                     if (_cts.IsCancellationRequested) break;
-                    Stage(Loc.T("stage.tunnel") + " · " + candidate.CountryName);
+                    if (attempt++ >= MaxAttempts) break;
+                    Stage(Loc.T("stage.tunnel") + " · " + candidate.Host);
+                    _log.Info("attempt " + attempt + ": " + candidate.Host + " (" + candidate.CountryCode + ")");
                     var attempt = await TryServerAsync(candidate, settings, _cts.Token).ConfigureAwait(false);
                     if (attempt.Ok)
                     {
@@ -220,7 +229,8 @@ namespace EndorVPN.Core
             long readOffset = 0;
             bool timedOut = false;
 
-            while (sw.ElapsedMilliseconds < 26000)
+            long budget = Math.Max(10, AttemptTimeoutSec) * 1000L;
+            while (sw.ElapsedMilliseconds < budget)
             {
                 if (ct.IsCancellationRequested) break;
                 await Task.Delay(220, ct).ConfigureAwait(false);
@@ -244,7 +254,7 @@ namespace EndorVPN.Core
 
             if (!_tunnelUp)
             {
-                timedOut = sw.ElapsedMilliseconds >= 26000;
+                timedOut = sw.ElapsedMilliseconds >= budget;
                 res.ErrorKey = classify(_lastLogLine, timedOut);
                 res.Detail = _lastLogLine;
                 StopProcess();

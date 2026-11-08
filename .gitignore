@@ -1,0 +1,18 @@
+# build output
+dist/
+setup/bin/
+setup/obj/
+engine/EndorVPN/bin/
+engine/EndorVPN/obj/
+*_msi/
+build/
+
+# runtime state of a local run
+engine/EndorVPN/data/
+
+# tooling
+node_modules/
+tools/*.log
+
+# release binaries live on GitHub Releases, not in git history
+releases/

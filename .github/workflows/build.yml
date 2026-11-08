@@ -101,13 +101,15 @@ jobs:
       - name: single-file exe
         shell: pwsh
         run: |
-          $sf = "dist\single"
-          New-Item -ItemType Directory -Force $sf | Out-Null
-          $ilmerge = "dist\ilmerge"
-          # Costura-free approach: use ILRepack-free single file by embedding OpenVPN cannot be done for native exe.
-          # We ship the portable folder + a self-extracting single .exe built from it.
-          Get-ChildItem dist\EndorVPN | ForEach-Object { Write-Host $_.Name }
-          Write-Host "folder size: $([math]::Round(((Get-ChildItem dist\EndorVPN -Recurse | Measure-Object Length -Sum).Sum/1MB),1)) MB"
+          Get-Process EndorVPN -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          Get-Process openvpn -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 2
+          msbuild setup\Setup.csproj /p:Configuration=Release /p:Platform=x64 /v:minimal /nologo
+          if ($LASTEXITCODE -ne 0) { throw "stub build failed" }
+          ./setup/pack-sfx.ps1 -Stub setup\bin\x64\Release\net48\EndorVPN-Setup.exe -AppDir dist\EndorVPN -Out dist\EndorVPN.exe
+          if (-not (Test-Path dist\EndorVPN.exe)) { throw "single-file build failed" }
+          Copy-Item dist\EndorVPN.exe releases\EndorVPN-$env:VERSION-win64.exe -Force
+          Get-ChildItem dist -Filter *.exe | Format-Table Name,Length
 
       - name: package zip
         shell: pwsh
@@ -148,6 +150,7 @@ jobs:
           path: |
             dist/EndorVPN/**
             dist/EndorVPN-win64.zip
+            dist/EndorVPN.exe
             ci/reports/*.png
           if-no-files-found: error
 
@@ -160,8 +163,9 @@ jobs:
           if ($LASTEXITCODE -eq 0) {
             Write-Host "release $tag exists - updating assets"
             gh release upload $tag dist\EndorVPN-win64.zip --clobber
+            if (Test-Path dist\EndorVPN.exe) { gh release upload $tag dist\EndorVPN.exe --clobber }
           } else {
-            gh release create $tag dist\EndorVPN-win64.zip --title "EndorVPN $env:VERSION" --notes @"
+            gh release create $tag dist\EndorVPN-win64.zip dist\EndorVPN.exe --title "EndorVPN $env:VERSION" --notes @"
           EndorVPN $env:VERSION - бесплатный VPN-клиент для Windows (RU/EN).
 
           **Как пользоваться**
@@ -184,12 +188,8 @@ jobs:
         run: |
           git config user.email "ci@endorvpn.local"
           git config user.name "EndorVPN CI"
-          New-Item -ItemType Directory -Force releases | Out-Null
-          Copy-Item dist\EndorVPN-win64.zip "releases\EndorVPN-$env:VERSION-win64.zip" -Force 2>$null
-          git add -f "releases/EndorVPN-$env:VERSION-win64.zip" 2>$null
-          git commit -m "release: EndorVPN $env:VERSION (win64)" | Out-Null
-          git pull --rebase origin arena/72bfde82-222 2>&1 | Out-Null
-          git push origin HEAD:arena/72bfde82-222 2>&1 | Out-Null
+          # Binaries are published as release assets; git history stays source-only.
+          Write-Host "release assets are published above; skipping binary commit"
 
       - name: publish build log to repo
         if: always()

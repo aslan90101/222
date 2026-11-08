@@ -93,7 +93,6 @@ namespace EndorVPN.Core
             if (!opts.UseWintun)
             {
                 outLines.Add("dev-node \"" + (opts.AdapterName ?? "EndorVPN") + "\"");
-                outLines.Add("windows-ip-win32 dynamic");
             }
             if (tcp) outLines.Add("proto tcp");
             else outLines.Add("proto udp");
@@ -104,7 +103,6 @@ namespace EndorVPN.Core
             if (!string.IsNullOrEmpty(opts.AuthFile))
             {
                 outLines.Add("auth-user-pass \"" + opts.AuthFile + "\"");
-                outLines.Add("auth-nocache");
             }
 
             // Carry over the server's crypto policy verbatim: VPN Gate nodes differ
@@ -120,9 +118,6 @@ namespace EndorVPN.Core
             {
                 if (l.StartsWith("route ", StringComparison.OrdinalIgnoreCase) ||
                     l.StartsWith("route-ipv6 ", StringComparison.OrdinalIgnoreCase) ||
-                    l.StartsWith("dhcp-option ", StringComparison.OrdinalIgnoreCase) ||
-                    l.StartsWith("redirect-gateway", StringComparison.OrdinalIgnoreCase) ||
-                    l.StartsWith("redirect-private", StringComparison.OrdinalIgnoreCase) ||
                     l.StartsWith("pull-filter ", StringComparison.OrdinalIgnoreCase) ||
                     l.StartsWith("tls-crypt ", StringComparison.OrdinalIgnoreCase) ||
                     l.StartsWith("tls-auth ", StringComparison.OrdinalIgnoreCase) ||

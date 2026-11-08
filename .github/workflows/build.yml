@@ -118,10 +118,15 @@ jobs:
           Get-Process EndorVPN -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           Start-Sleep -Seconds 3
           $zip = "dist\EndorVPN-win64.zip"
-          if (Test-Path $zip) { Remove-Item $zip -Force }
+          # a shipped build must not contain runtime state: logs, cache, settings
+          Get-Process openvpn -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          foreach ($stale in @("dist\EndorVPN\data\work\openvpn.log", "dist\EndorVPN\data\work\active.ovpn", "dist\EndorVPN\data\work\auth.txt", "dist\EndorVPN\data\endorvpn.log", "dist\EndorVPN\data\ui-ready.txt")) {
+            if (Test-Path $stale) { try { Remove-Item $stale -Force -ErrorAction Stop } catch { Write-Host "cannot remove $stale : $($_.Exception.Message)" } }
+          }
           $ok = $false
           for ($i = 1; $i -le 3; $i++) {
             try {
+              if (Test-Path $zip) { Remove-Item $zip -Force -ErrorAction Stop }
               Add-Type -AssemblyName System.IO.Compression.FileSystem
               [System.IO.Compression.ZipFile]::CreateFromDirectory((Resolve-Path "dist\EndorVPN").Path, (Join-Path (Resolve-Path "dist").Path "EndorVPN-win64.zip"), [System.IO.Compression.CompressionLevel]::Optimal, $true)
               $ok = $true

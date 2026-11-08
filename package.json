@@ -1,0 +1,24 @@
+{
+  "name": "222",
+  "version": "1.0.0",
+  "description": "Бесплатный VPN-клиент для Windows с большим выбором стран, флагами и двуязычным интерфейсом (RU / EN). EndorVPN — это честный GUI-обёртка над проверенными open-source компонентами: **OpenVPN** (шифрование и туннель), **VPN Gate** (публичный список бесплатных серверов по всему миру) и **sing-box / VLESS** (резервный быстрый транспорт для стран, где OpenVPN недоступен).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aslan90101/222.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aslan90101/222/issues"
+  },
+  "homepage": "https://github.com/aslan90101/222#readme",
+  "devDependencies": {
+    "cldr-localenames-modern": "^45.0.0",
+    "sharp": "^0.35.5"
+  }
+}

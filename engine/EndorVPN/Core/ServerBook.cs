@@ -28,8 +28,10 @@ namespace EndorVPN.Core
 
             public VpnServer Best()
             {
+                // Same reasoning as SmartPick: a reachable VPNBook node beats a
+                // theoretically faster VPN Gate volunteer that answers AUTH_FAILED.
                 return Servers
-                    .OrderByDescending(s => s._measuredPing > 0 ? 1 : 0)
+                    .OrderBy(s => string.Equals(s.Provider, "vpnbook", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
                     .ThenBy(s => s._measuredPing > 0 ? s._measuredPing : (s.Ping > 0 ? s.Ping : 9999))
                     .ThenByDescending(s => s.SpeedBps)
                     .FirstOrDefault();

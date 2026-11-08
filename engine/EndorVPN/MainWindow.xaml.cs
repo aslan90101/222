@@ -44,6 +44,7 @@ namespace EndorVPN
         private string _stage = "";
         private System.Windows.Forms.NotifyIcon _tray;
         private bool _realIpLoaded;
+        private bool _stageLive;
         private string _autoLastCountry;
 
         public MainWindow()
@@ -101,7 +102,15 @@ namespace EndorVPN
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // window shadow needs a moment to settle when AllowsTransparency is on
+            // Fit small laptop / VM screens: never taller than the work area.
+            var wa = SystemParameters.WorkArea;
+            if (Height > wa.Height - 24)
+                Height = Math.Max(MinHeight, wa.Height - 24);
+            if (Width > wa.Width - 24)
+                Width = Math.Max(MinWidth, wa.Width - 24);
+            Left = wa.Left + (wa.Width - Width) / 2;
+            Top = wa.Top + Math.Max(0, (wa.Height - Height) / 2);
+
             RootShell.Opacity = 0;
             await Task.Delay(30);
             Theme.FadeIn(RootShell, 260);
@@ -197,6 +206,7 @@ namespace EndorVPN
             EmptyState.Visibility = Visibility.Visible;
             EmptyTitle.Text = Loc.T("picker.noservers");
             EmptyHint.Text = Loc.T("picker.noservers.hint");
+            LastUpdatedText.Text = Loc.T("picker.never");
         }
 
         private void SetRefreshButtonState(bool loading)
@@ -305,8 +315,10 @@ namespace EndorVPN
             string hintKey = _state == VpnEngine.State.Connected ? "hero.hint.disconnect"
                 : _state == VpnEngine.State.Connecting || _state == VpnEngine.State.Disconnecting ? "hero.hint.busy"
                 : string.IsNullOrEmpty(_selectedCountry) ? "hero.hint.nocountry" : "hero.hint.connect";
-            PowerHint.Text = (!string.IsNullOrEmpty(_stage) && (_state == VpnEngine.State.Connecting || _state == VpnEngine.State.Disconnecting))
+            PowerHint.Text = (_stageLive && !string.IsNullOrEmpty(_stage) &&
+                              (_state == VpnEngine.State.Connecting || _state == VpnEngine.State.Disconnecting))
                 ? _stage : Loc.T(hintKey);
+            if (_state == VpnEngine.State.Idle || _state == VpnEngine.State.Connected) _stageLive = false;
 
             Grid.SetRowSpan(ToastHost, 1);
             var glow = TopGlow.Fill as RadialGradientBrush;
@@ -411,6 +423,7 @@ namespace EndorVPN
         private void StageText(string text)
         {
             _stage = text;
+            _stageLive = true;
             RefreshHero();
         }
 

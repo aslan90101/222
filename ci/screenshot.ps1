@@ -24,7 +24,7 @@ public class WinApi {
 $full = (Resolve-Path $Exe).Path
 Write-Host "launching $full"
 $p = Start-Process $full -PassThru
-Start-Sleep -Seconds 14
+Start-Sleep -Seconds 22
 if ($p.HasExited) { Write-Host "EXITED code=$($p.ExitCode)" }
 $hwnd = $p.MainWindowHandle
 Write-Host "hwnd=$hwnd title=$($p.MainWindowTitle)"
@@ -46,11 +46,11 @@ function Shot($name) {
 }
 Shot "shot-1-main-ru.png"
 # switch to EN (top-right language segmented control)
-[WinApi]::Click(($rect.Right - 108), ($rect.Top + 27))
+[WinApi]::Click(($rect.Right - 106), ($rect.Top + 27))
 Start-Sleep -Milliseconds 900
 Shot "shot-2-main-en.png"
 # open settings
-[WinApi]::Click(($rect.Right - 76), ($rect.Top + 27))
+[WinApi]::Click(($rect.Right - 74), ($rect.Top + 27))
 Start-Sleep -Milliseconds 1200
 Shot "shot-3-settings.png"
 # close settings

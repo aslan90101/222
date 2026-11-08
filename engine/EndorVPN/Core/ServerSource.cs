@@ -108,31 +108,43 @@ namespace EndorVPN.Core
             }
         }
 
-        /// <summary>Fetches the list, trying every source, then returns parsed results.</summary>
+        /// <summary>
+        /// Fetches from every source in parallel and uses the first non-empty
+        /// answer, so a blocked primary host costs nothing in perceived speed.
+        /// </summary>
         public static async Task<List<VpnServer>> LoadAsync(Log log, CancellationToken ct)
         {
             var urls = new[] { PrimaryUrl, FallbackUrl, MirrorUrl };
-            Exception last = null;
-            for (int i = 0; i < urls.Length; i++)
+            var tasks = new List<Task<List<VpnServer>>>();
+            foreach (var url in urls)
             {
-                if (ct.IsCancellationRequested) break;
-                try
+                var captured = url;
+                tasks.Add(Task.Run(async () =>
                 {
-                    var sw = System.Diagnostics.Stopwatch.StartNew();
-                    string raw = await FetchAsync(urls[i], 30000, ct).ConfigureAwait(false);
-                    sw.Stop();
-                    log.Info("server list from " + urls[i] + " in " + sw.ElapsedMilliseconds + " ms, " + raw.Length + " chars");
-                    var parsed = Parse(raw, log);
-                    if (parsed.Count > 0) return parsed;
-                }
-                catch (OperationCanceledException) { throw; }
-                catch (Exception ex)
-                {
-                    last = ex;
-                    log.Warn("source failed " + urls[i] + ": " + ex.Message);
-                }
+                    try
+                    {
+                        var sw = System.Diagnostics.Stopwatch.StartNew();
+                        string raw = await FetchAsync(captured, 14000, ct).ConfigureAwait(false);
+                        sw.Stop();
+                        log.Info("server list from " + captured + " in " + sw.ElapsedMilliseconds + " ms, " + raw.Length + " chars");
+                        return Parse(raw, log);
+                    }
+                    catch (OperationCanceledException) { return new List<VpnServer>(); }
+                    catch (Exception ex)
+                    {
+                        log.Warn("source failed " + captured + ": " + ex.Message);
+                        return new List<VpnServer>();
+                    }
+                }, ct));
             }
-            if (last != null) log.Error("all server sources failed: " + last.Message);
+            while (tasks.Count > 0)
+            {
+                var finished = await Task.WhenAny(tasks).ConfigureAwait(false);
+                tasks.Remove(finished);
+                var list = finished.Result;
+                if (list != null && list.Count > 0) return list;
+            }
+            log.Error("all server sources failed");
             return new List<VpnServer>();
         }
 

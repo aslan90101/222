@@ -153,9 +153,25 @@ namespace EndorVPN.Core
                 return res;
             }
 
+            string authFile = null;
+            if (!string.IsNullOrEmpty(server.AuthUser) && !string.IsNullOrEmpty(server.AuthPass))
+            {
+                authFile = Path.Combine(_paths.WorkDir, "auth.txt");
+                try
+                {
+                    File.WriteAllText(authFile, server.AuthUser + "\r\n" + server.AuthPass + "\r\n", new UTF8Encoding(false));
+                }
+                catch (Exception ex)
+                {
+                    _log.Warn("auth file write failed: " + ex.Message);
+                    authFile = null;
+                }
+            }
+
             var opts = new ConfigBuilder.Options
             {
                 AdapterName = TapManager.AdapterName,
+                AuthFile = authFile,
                 Transport = settings.Transport == "tcp" ? ConfigBuilder.Transport.Tcp
                           : settings.Transport == "udp" ? ConfigBuilder.Transport.Udp
                           : ConfigBuilder.Transport.Auto,

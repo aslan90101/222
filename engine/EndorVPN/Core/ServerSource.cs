@@ -23,6 +23,11 @@ namespace EndorVPN.Core
         public string Operator { get; set; }
         public string ConfigBase64 { get; set; }
 
+        /// <summary>"vpngate" or "vpnbook". Drives which auth method the engine uses.</summary>
+        public string Provider { get; set; } = "vpngate";
+        public string AuthUser { get; set; }
+        public string AuthPass { get; set; }
+
         /// <summary>Last measured TCP connect time (ms), 0 when unmeasured. Not persisted.</summary>
         [System.Xml.Serialization.XmlIgnore]
         public int _measuredPing { get; set; }

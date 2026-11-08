@@ -27,6 +27,7 @@ namespace EndorVPN
         public static void Main(string[] args)
         {
             bool smokeTest = args.Any(a => a.Equals("--smoke-test", StringComparison.OrdinalIgnoreCase));
+            bool e2e = args.Any(a => a.Equals("--e2e-connect", StringComparison.OrdinalIgnoreCase));
             bool minimized = args.Any(a => a.Equals("--minimized", StringComparison.OrdinalIgnoreCase));
 
             Paths = Paths.Resolve();
@@ -38,6 +39,14 @@ namespace EndorVPN
             {
                 int code = SmokeTest.Run(Paths, Log);
                 Log.Info("smoke exit " + code);
+                Environment.Exit(code);
+                return;
+            }
+
+            if (e2e)
+            {
+                int code = E2eTest.Run(Paths, Log).GetAwaiter().GetResult();
+                Log.Info("e2e exit " + code);
                 Environment.Exit(code);
                 return;
             }

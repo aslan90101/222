@@ -104,6 +104,7 @@ namespace EndorVPN.Core
             if (!string.IsNullOrEmpty(opts.AuthFile))
             {
                 outLines.Add("auth-user-pass \"" + opts.AuthFile + "\"");
+                outLines.Add("auth-nocache");
             }
 
             // Carry over the server's crypto policy verbatim: VPN Gate nodes differ

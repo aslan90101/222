@@ -122,7 +122,7 @@ namespace EndorVPN
             var cached = _cache.Load();
             if (!string.IsNullOrEmpty(cached))
             {
-                var servers = ServerSource.Parse(cached, Program.Log);
+                var servers = ParseCache(cached);
                 if (servers.Count > 0)
                 {
                     _book.SetServers(servers, _settings.Favorites.Keys);
@@ -173,9 +173,25 @@ namespace EndorVPN
                 if (_book.Servers.Count > 0) EmptyState.Visibility = Visibility.Collapsed;
                 SetRefreshButtonState(true);
 
-                using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(45)))
+                using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30)))
                 {
-                    var servers = await ServerSource.LoadAsync(Program.Log, cts.Token);
+                    var gate = Task.Run(() => ServerSource.LoadAsync(Program.Log, cts.Token));
+                    var bookTask = Task.Run(() => VpnBookSource.LoadAsync(Program.Log, cts.Token));
+                    var servers = await gate;
+                    VpnBookSource.Bundle vb = null;
+                    try
+                    {
+                        if (await Task.WhenAny(bookTask, Task.Delay(12000)) == bookTask)
+                            vb = bookTask.Result;
+                    }
+                    catch (Exception ex) { Program.Log.Warn("vpnbook merge failed: " + ex.Message); }
+                    if (vb != null && vb.Ok)
+                    {
+                        var seen = new HashSet<string>(servers.Select(x => x.CountryCode + "|" + x.Host));
+                        foreach (var extra in vb.Servers)
+                            if (seen.Add(extra.CountryCode + "|" + extra.Host)) servers.Add(extra);
+                        Program.Log.Info("merged providers: " + servers.Count + " servers");
+                    }
                     if (servers.Count > 0)
                     {
                         _book.SetServers(servers, _settings.Favorites.Keys);
@@ -215,6 +231,62 @@ namespace EndorVPN
             BtnRefreshList.Content = loading ? Loc.T("picker.loading") : Loc.T("picker.refresh");
         }
 
+        /// <summary>Reads our own compact cache format (not the VPN Gate CSV).</summary>
+        private static List<VpnServer> ParseCache(string json)
+        {
+            var list = new List<VpnServer>();
+            if (string.IsNullOrEmpty(json)) return list;
+            int i = 0;
+            while (true)
+            {
+                int start = json.IndexOf('{', i);
+                if (start < 0) break;
+                int end = json.IndexOf('}', start);
+                if (end < 0) break;
+                string obj = json.Substring(start, end - start + 1);
+                i = end + 1;
+                var s = new VpnServer
+                {
+                    Host = CacheStr(obj, "h"),
+                    Ip = CacheStr(obj, "i"),
+                    Ping = CacheInt(obj, "p"),
+                    SpeedBps = CacheLong(obj, "sp"),
+                    Score = CacheLong(obj, "s"),
+                    Sessions = CacheInt(obj, "n"),
+                    Country = CacheStr(obj, "c"),
+                    CountryCode = CacheStr(obj, "cc"),
+                    Operator = CacheStr(obj, "o"),
+                    ConfigBase64 = CacheStr(obj, "b"),
+                    Provider = CacheStr(obj, "pr") ?? "vpngate",
+                    AuthUser = CacheStr(obj, "au"),
+                    AuthPass = CacheStr(obj, "ap"),
+                };
+                if (!string.IsNullOrEmpty(s.Host) && !string.IsNullOrEmpty(s.ConfigBase64) && s.CountryCode != null)
+                    list.Add(s);
+            }
+            return list;
+        }
+
+        private static string CacheStr(string obj, string key)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(obj, "\"" + key + "\":\"((?:[^\"\\\\]|\\\\.)*)\"" );
+            return m.Success ? System.Text.RegularExpressions.Regex.Unescape(m.Groups[1].Value) : null;
+        }
+
+        private static int CacheInt(string obj, string key)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(obj, "\"" + key + "\":(-?\\d+)");
+            int v;
+            return m.Success && int.TryParse(m.Groups[1].Value, out v) ? v : 0;
+        }
+
+        private static long CacheLong(string obj, string key)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(obj, "\"" + key + "\":(-?\\d+)");
+            long v;
+            return m.Success && long.TryParse(m.Groups[1].Value, out v) ? v : 0;
+        }
+
         private string BuildCacheJson(List<VpnServer> servers)
         {
             var sb = new System.Text.StringBuilder(servers.Count * 2200);
@@ -232,7 +304,11 @@ namespace EndorVPN
                   .Append(",\"c\":\"").Append(Security.JsonEscape(s.Country))
                   .Append("\",\"cc\":\"").Append(Security.JsonEscape(s.CountryCode))
                   .Append("\",\"o\":\"").Append(Security.JsonEscape(s.Operator ?? ""))
-                  .Append("\",\"b\":\"").Append(Security.JsonEscape(s.ConfigBase64)).Append("\"}");
+                  .Append("\",\"b\":\"").Append(Security.JsonEscape(s.ConfigBase64))
+                  .Append("\",\"pr\":\"").Append(Security.JsonEscape(s.Provider ?? "vpngate"))
+                  .Append("\",\"au\":\"").Append(Security.JsonEscape(s.AuthUser ?? ""))
+                  .Append("\",\"ap\":\"").Append(Security.JsonEscape(s.AuthPass ?? ""))
+                  .Append("\"}");
             }
             sb.Append("]");
             return sb.ToString();

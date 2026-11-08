@@ -76,6 +76,11 @@ jobs:
           Set-Content -Path ci/smoke-output.txt -Value ("exit=" + $p.ExitCode + "`n" + $report + "`n---- log ----`n" + $appLog) -Encoding utf8
           if ($p.ExitCode -ne 0) { throw "smoke test failed" }
 
+      - name: e2e tunnel test
+        shell: pwsh
+        continue-on-error: true
+        run: ./ci/e2e-connect.ps1 -Exe dist\EndorVPN\EndorVPN.exe -Report ci\reports\e2e.json
+
       - name: ui screenshots
         shell: pwsh
         continue-on-error: true

@@ -11,4 +11,4 @@ D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'M
     2 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:10.96
+Time Elapsed 00:00:08.46

@@ -17,11 +17,8 @@
     <Deterministic>true</Deterministic>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-  </PropertyGroup>
-
-  <ItemGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-  </ItemGroup>
+  </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="System.IO.Compression" />

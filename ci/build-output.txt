@@ -1,19 +1,27 @@
   Determining projects to restore...
-  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 190 ms).
-D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(39,26): error CS0246: The type or namespace name 'HttpClient' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1081,56): error CS0246: The type or namespace name 'CancelEventArgs' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\UI\Theme.cs(68,33): error CS0102: The type 'Theme' already contains a definition for 'Text' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 250 ms).
+D:\a\222\222\engine\EndorVPN\Program.cs(27,28): error CS0017: Program has more than one entry point defined. Compile with /main to specify the type that contains the entry point. [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\ConfigBuilder.cs(168,13): error CS0246: The type or namespace name 'IPAddress' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\ConfigBuilder.cs(169,25): error CS0103: The name 'IPAddress' does not exist in the current context [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Program.cs(64,30): error CS7036: There is no argument given that corresponds to the required parameter 'uiDev' of 'MainWindow.MainWindow(bool)' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(581,17): error CS0117: 'Button' does not contain a definition for 'Child' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(827,32): error CS0246: The type or namespace name 'UniformGrid' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(861,33): error CS0246: The type or namespace name 'UniformGrid' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1126,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(36,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 
 Build FAILED.
 
-D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(39,26): error CS0246: The type or namespace name 'HttpClient' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1081,56): error CS0246: The type or namespace name 'CancelEventArgs' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\UI\Theme.cs(68,33): error CS0102: The type 'Theme' already contains a definition for 'Text' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-    0 Warning(s)
-    5 Error(s)
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1126,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(36,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Program.cs(27,28): error CS0017: Program has more than one entry point defined. Compile with /main to specify the type that contains the entry point. [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\ConfigBuilder.cs(168,13): error CS0246: The type or namespace name 'IPAddress' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\ConfigBuilder.cs(169,25): error CS0103: The name 'IPAddress' does not exist in the current context [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Program.cs(64,30): error CS7036: There is no argument given that corresponds to the required parameter 'uiDev' of 'MainWindow.MainWindow(bool)' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(581,17): error CS0117: 'Button' does not contain a definition for 'Child' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(827,32): error CS0246: The type or namespace name 'UniformGrid' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(861,33): error CS0246: The type or namespace name 'UniformGrid' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+    2 Warning(s)
+    7 Error(s)
 
-Time Elapsed 00:00:20.32
+Time Elapsed 00:00:12.49

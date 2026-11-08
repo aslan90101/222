@@ -1,0 +1,10 @@
+name: probe
+on:
+  push:
+    branches: [arena/72bfde82-222]
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "actions-ok"; node -v

@@ -112,7 +112,24 @@ jobs:
       - name: package zip
         shell: pwsh
         run: |
-          Compress-Archive -Path dist\EndorVPN\* -DestinationPath dist\EndorVPN-win64.zip -Force
+          # the screenshot run may still hold the exe open; make sure it is gone
+          Get-Process EndorVPN -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 3
+          $zip = "dist\EndorVPN-win64.zip"
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          $ok = $false
+          for ($i = 1; $i -le 3; $i++) {
+            try {
+              Add-Type -AssemblyName System.IO.Compression.FileSystem
+              [System.IO.Compression.ZipFile]::CreateFromDirectory((Resolve-Path "dist\EndorVPN").Path, (Join-Path (Resolve-Path "dist").Path "EndorVPN-win64.zip"), [System.IO.Compression.CompressionLevel]::Optimal, $true)
+              $ok = $true
+              break
+            } catch {
+              Write-Host "zip attempt ${i} failed: $($_.Exception.Message)"
+              Start-Sleep -Seconds 5
+            }
+          }
+          if (-not $ok) { throw "could not create zip" }
           Get-ChildItem dist | Format-Table Name,Length
 
       - uses: actions/upload-artifact@v4

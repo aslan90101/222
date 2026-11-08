@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
+using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using System.Windows.Threading;
 using EndorVPN.Core;
@@ -45,7 +46,7 @@ namespace EndorVPN
         private bool _realIpLoaded;
         private string _autoLastCountry;
 
-        public MainWindow(bool uiDev)
+        public MainWindow()
         {
             InitializeComponent();
 
@@ -578,7 +579,7 @@ namespace EndorVPN
                 Height = 22,
                 Style = (Style)FindResource("TinyIconButton"),
                 ToolTip = Loc.T("tabs.favorite"),
-                Child = Theme.Icon("M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5Z", 12,
+                Content = Theme.Icon("M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5Z", 12,
                     c.IsFavorite ? Theme.WarnBrush : Theme.Solid(Color.FromArgb(0x59, 0x93, 0xA0, 0xBD))),
             };
             b.Click += (s, e) =>

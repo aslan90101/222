@@ -20,7 +20,14 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <Nullable>disable</Nullable>
+    <StartupObject>EndorVPN.Program</StartupObject>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Net.Http" />

@@ -107,12 +107,11 @@ jobs:
           Get-Process openvpn -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           Start-Sleep -Seconds 2
           dotnet build setup\Setup.csproj -c Release /p:Platform=x64 -v minimal *>&1 | Tee-Object -FilePath ci/sfx-build.txt
-          if ($LASTEXITCODE -ne 0) {
-            Get-Content ci/sfx-build.txt | Select-Object -Last 40 | ForEach-Object { Write-Host $_ }
-            throw "stub build failed"
-          }
+          Get-Content ci/sfx-build.txt | Select-Object -Last 25 | ForEach-Object { Write-Host $_ }
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path setup\bin\x64\Release\net48\EndorVPN-Setup.exe)) { throw "stub build failed" }
           ./setup/pack-sfx.ps1 -Stub setup\bin\x64\Release\net48\EndorVPN-Setup.exe -AppDir dist\EndorVPN -Out dist\EndorVPN.exe
           if (-not (Test-Path dist\EndorVPN.exe)) { throw "single-file build failed" }
+          Write-Host "single exe: $([math]::Round((Get-Item dist\EndorVPN.exe).Length/1MB,2)) MB"
           Get-ChildItem dist -Filter *.exe | Format-Table Name,Length
           Stop-Transcript | Out-Null
 

@@ -2,8 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <LangVersion>latest</LangVersion>
+        <LangVersion>latest</LangVersion>
     <AssemblyName>EndorVPN-Setup</AssemblyName>
     <RootNamespace>EndorVpnSetup</RootNamespace>
     <ApplicationIcon>..\engine\EndorVPN\app.ico</ApplicationIcon>

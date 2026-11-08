@@ -200,6 +200,7 @@ namespace EndorVPN
                         if (!silent)
                             Toast(Loc.T("toast.servers", servers.Count), ToastKind.Ok);
                         LastUpdatedText.Text = Loc.T("picker.updated", DateTime.Now.ToString("HH:mm"));
+                        _ = MeasureLatencyAsync();
                     }
                     else if (_book.Servers.Count == 0)
                     {
@@ -215,6 +216,21 @@ namespace EndorVPN
                 SetRefreshButtonState(false);
                 UpdateServerBadge();
             }
+        }
+
+        private async Task MeasureLatencyAsync()
+        {
+            try
+            {
+                var progress = new Progress<int>(p => { if (p >= 100) RenderCountries(); });
+                using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(25)))
+                {
+                    await _book.MeasureLatencyAsync(progress, cts.Token);
+                }
+                RenderCountries();
+                Program.Log.Info("latency probe finished");
+            }
+            catch (Exception ex) { Program.Log.Warn("latency probe: " + ex.Message); }
         }
 
         private void ShowEmptyServers()

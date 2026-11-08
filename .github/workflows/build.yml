@@ -66,6 +66,11 @@ jobs:
           $p = Start-Process dist\EndorVPN\EndorVPN.exe -ArgumentList '--smoke-test' -Wait -PassThru -NoNewWindow
           Write-Host "smoke exit=$($p.ExitCode)"
           if (Test-Path dist\EndorVPN\data\smoke-report.txt) { Get-Content dist\EndorVPN\data\smoke-report.txt | ForEach-Object { Write-Host $_ } }
+          if (Test-Path dist\EndorVPN\data\endorvpn.log) { Write-Host "---- app log ----"; Get-Content dist\EndorVPN\data\endorvpn.log | Select-Object -Last 40 | ForEach-Object { Write-Host $_ } }
+          New-Item -ItemType Directory -Force ci | Out-Null
+          $report = if (Test-Path dist\EndorVPN\data\smoke-report.txt) { Get-Content dist\EndorVPN\data\smoke-report.txt -Raw } else { "no report" }
+          $appLog = if (Test-Path dist\EndorVPN\data\endorvpn.log) { Get-Content dist\EndorVPN\data\endorvpn.log -Raw } else { "no log" }
+          Set-Content -Path ci/smoke-output.txt -Value ("exit=" + $p.ExitCode + "`n" + $report + "`n---- log ----`n" + $appLog) -Encoding utf8
           if ($p.ExitCode -ne 0) { throw "smoke test failed" }
 
       - name: ui screenshots
@@ -144,9 +149,8 @@ jobs:
         run: |
           git config user.email "ci@endorvpn.local"
           git config user.name "EndorVPN CI"
-          if (Test-Path ci/build-output.txt) {
-            git add -f ci/build-output.txt
-            git commit -m "ci: build output" | Out-Null
-          }
+          if (Test-Path ci/build-output.txt) { git add -f ci/build-output.txt }
+          if (Test-Path ci/smoke-output.txt) { git add -f ci/smoke-output.txt }
+          git commit -m "ci: build output" | Out-Null
           git pull --rebase origin arena/72bfde82-222 2>&1 | Out-Null
           git push origin HEAD:arena/72bfde82-222 2>&1 | Out-Null

@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  VERSION: 1.1.0
+  VERSION: 1.1.1
   OPENVPN_MSI: https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.12-I001-amd64.msi
   TAP_INSTALLER: https://build.openvpn.net/downloads/releases/tap-windows-9.24.7-I601-Win10.exe
 
@@ -195,6 +195,7 @@ jobs:
           3. Выберите страну и нажмите большую кнопку. TAP-драйвер установится сам.
 
           **Что нового в $env:VERSION**
+          - Исправлен ``installer payload offset mismatch``: установщик в одном файле теперь корректно распаковывается.
           - Список стран больше не оставался пустым: загрузка шла из фонового потока, минуя UI-поток.
           - Подключение стало быстрым: мгновенный выход при AUTH_FAILED и автоматический переход на VPNBook, если узел VPN Gate не пускает.
           - Стабильные узлы VPNBook пробуются первыми, VPN Gate остаётся для широкого покрытия стран.

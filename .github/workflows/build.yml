@@ -111,7 +111,9 @@ jobs:
 
       - name: package zip
         shell: pwsh
+        continue-on-error: true
         run: |
+          Start-Transcript -Path ci/zip-output.txt -Force | Out-Null
           # the screenshot run may still hold the exe open; make sure it is gone
           Get-Process EndorVPN -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           Start-Sleep -Seconds 3
@@ -131,6 +133,9 @@ jobs:
           }
           if (-not $ok) { throw "could not create zip" }
           Get-ChildItem dist | Format-Table Name,Length
+          Get-ChildItem dist\EndorVPN -Recurse | Measure-Object Length -Sum | ForEach-Object { Write-Host "folder bytes: $($_.Sum)" }
+          Write-Host "zip bytes: $((Get-Item dist\EndorVPN-win64.zip).Length)"
+          Stop-Transcript | Out-Null
 
       - uses: actions/upload-artifact@v4
         with:
@@ -144,6 +149,7 @@ jobs:
       - name: publish release
         shell: pwsh
         run: |
+          if (-not (Test-Path dist\EndorVPN-win64.zip)) { Write-Host "no zip - skipping release"; exit 0 }
           $tag = "v$env:VERSION"
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) {
@@ -189,6 +195,7 @@ jobs:
           if (Test-Path ci/build-output.txt) { git add -f ci/build-output.txt }
           if (Test-Path ci/smoke-output.txt) { git add -f ci/smoke-output.txt }
           if (Test-Path ci/verify-output.txt) { git add -f ci/verify-output.txt }
+          if (Test-Path ci/zip-output.txt) { git add -f ci/zip-output.txt }
           if (Test-Path ci/reports/e2e.json) { git add -f ci/reports/e2e.json }
           Get-ChildItem ci\reports\*.* -ErrorAction SilentlyContinue | ForEach-Object { git add -f $_.FullName.Replace($PWD.Path + "\", "").Replace("\", "/") }
           git commit -m "ci: build output" | Out-Null

@@ -200,6 +200,7 @@ namespace EndorVPN
                     if (servers.Count > 0)
                     {
                         _book.SetServers(servers, _settings.Favorites.Keys);
+                        EnsureDefaultCountry();
                         _cache.Save(BuildCacheJson(servers));
                         RenderCountries();
                         if (!silent)
@@ -220,6 +221,46 @@ namespace EndorVPN
                 _busy = false;
                 SetRefreshButtonState(false);
                 UpdateServerBadge();
+            }
+        }
+
+        /// <summary>
+        /// Fresh install / empty selection: preselect the fastest place so the
+        /// big button is actionable instead of nagging for a country.
+        /// </summary>
+        private void EnsureDefaultCountry()
+        {
+            if (!string.IsNullOrEmpty(_selectedCountry) && _book.GetCountry(_selectedCountry) != null)
+            {
+                RefreshHero();
+                return;
+            }
+            var best = _book.SmartPick();
+            if (best == null)
+            {
+                var first = _book.Countries.Values.FirstOrDefault();
+                if (first == null) return;
+                best = first.Best();
+            }
+            if (best == null) return;
+            _selectedCountry = best.CountryCode;
+            _settings.SelectedCountry = _selectedCountry;
+            _settings.Save(Program.Paths.SettingsFile);
+            HighlightByCode(_selectedCountry);
+            Program.Log.Info("default country: " + _selectedCountry);
+            UpdateSelectedCountryLabel();
+            RefreshHero();
+        }
+
+        private void HighlightByCode(string code)
+        {
+            foreach (var child in CountryList.Children)
+            {
+                var border = child as Border;
+                if (border == null) continue;
+                bool on = string.Equals(border.Tag as string, code, StringComparison.OrdinalIgnoreCase);
+                border.Background = on ? Theme.Solid(Color.FromArgb(0x2E, 0x3B, 0x82, 0xF6)) : Brushes.Transparent;
+                border.BorderBrush = on ? Theme.Solid(Color.FromArgb(0x4D, 0x78, 0xAA, 0xFF)) : Brushes.Transparent;
             }
         }
 

@@ -1,40 +1,45 @@
 param(
-  [string]$Exe = "dist\EndorVPN\EndorVPN.exe",
+  [string]$Exe = "dist/EndorVPN/EndorVPN.exe",
   [string]$OutDir = "ci/reports"
 )
-$ErrorActionPreference = 'Continue'
-$ProgressPreference = 'SilentlyContinue'
+$ErrorActionPreference = "Continue"
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName UIAutomationClient
+Add-Type -AssemblyName UIAutomationTypes
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
-Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
 public class WinApi {
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-  [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
-  [DllImport("user32.dll")] public static extern void mouse_event(uint flags, uint dx, uint dy, uint data, UIntPtr extra);
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
   public struct RECT { public int Left, Top, Right, Bottom; }
-  public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
-  public const uint MOUSEEVENTF_LEFTUP = 0x0004;
-  public static void Click(int x, int y) { SetCursorPos(x, y); System.Threading.Thread.Sleep(120); mouse_event(MOUSEEVENTF_LEFTDOWN,0,0,0,UIntPtr.Zero); System.Threading.Thread.Sleep(60); mouse_event(MOUSEEVENTF_LEFTUP,0,0,0,UIntPtr.Zero); }
 }
 "@
+
 $full = (Resolve-Path $Exe).Path
+$appDir = Split-Path $full -Parent
 Write-Host "launching $full"
 $p = Start-Process $full -PassThru
-$readyFile = Join-Path (Split-Path $full -Parent) "data\ui-ready.txt"
+
+# wait for the app to signal that the country list has rendered
+$readyFile = Join-Path $appDir "data\ui-ready.txt"
 if (Test-Path $readyFile) { Remove-Item $readyFile -Force }
-$deadline = (Get-Date).AddSeconds(75)
+$deadline = (Get-Date).AddSeconds(90)
 while ((Get-Date) -lt $deadline) {
   Start-Sleep -Milliseconds 700
   if (Test-Path $readyFile) { Write-Host "ui ready marker found"; break }
   if ($p.HasExited) { break }
 }
-Start-Sleep -Seconds 3
-if ($p.HasExited) { Write-Host "EXITED code=$($p.HasExitCode)$($p.ExitCode)" }
+Start-Sleep -Seconds 2
+if ($p.HasExited) { Write-Host "EXITED code=$($p.ExitCode)" }
+
 $hwnd = $p.MainWindowHandle
+if ($hwnd -eq [IntPtr]::Zero) {
+  for ($i = 0; $i -lt 30; $i++) { Start-Sleep -Milliseconds 500; $p.Refresh(); $hwnd = $p.MainWindowHandle; if ($hwnd -ne [IntPtr]::Zero) { break } }
+}
 Write-Host "hwnd=$hwnd title=$($p.MainWindowTitle)"
 [WinApi]::ShowWindow($hwnd, 5) | Out-Null
 [WinApi]::SetForegroundWindow($hwnd) | Out-Null
@@ -42,8 +47,11 @@ Start-Sleep -Seconds 2
 
 $rect = New-Object WinApi+RECT
 [WinApi]::GetWindowRect($hwnd, [ref]$rect) | Out-Null
-Write-Host "rect=$($rect.Left),$($rect.Top),$($rect.Right),$($rect.Bottom)"
-$bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+$w = $rect.Right - $rect.Left
+$h = $rect.Bottom - $rect.Top
+Write-Host "rect=$($rect.Left),$($rect.Top) size=${w}x${h}"
+
+$bounds = New-Object System.Drawing.Rectangle($rect.Left, $rect.Top, $w, $h)
 function Shot($name) {
   $bmp = New-Object System.Drawing.Bitmap($bounds.Width, $bounds.Height)
   $g = [System.Drawing.Graphics]::FromImage($bmp)
@@ -52,33 +60,78 @@ function Shot($name) {
   $g.Dispose(); $bmp.Dispose()
   Write-Host "shot $name"
 }
+
+# ---- UI Automation helpers (independent of window size / DPI) ----
+$root = [System.Windows.Automation.AutomationElement]::FromHandle($hwnd)
+function Find-ById($id) {
+  $cond = New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::AutomationIdProperty, $id)
+  for ($i = 0; $i -lt 20; $i++) {
+    $el = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $cond)
+    if ($el -ne $null) { return $el }
+    Start-Sleep -Milliseconds 400
+  }
+  return $null
+}
+function Invoke-ById($id) {
+  $el = Find-ById $id
+  if ($el -eq $null) { Write-Host "UIA: element '$id' not found"; return $false }
+  try {
+    $pat = $el.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+    $pat.Invoke()
+    Write-Host "UIA: invoked '$id'"
+    return $true
+  } catch {
+    Write-Host "UIA: invoke failed for '$id': $($_.Exception.Message)"
+    return $false
+  }
+}
+
 Shot "shot-1-main-ru.png"
 Write-Host "---- app log after boot ----"
-$logPath0 = Join-Path (Split-Path $full -Parent) "data\endorvpn.log"
-if (Test-Path $logPath0) { Get-Content $logPath0 | Select-Object -Last 25 | ForEach-Object { Write-Host $_ } }
-# switch to EN (top-right language segmented control)
-[WinApi]::Click(($rect.Right - 106), ($rect.Top + 27))
-Start-Sleep -Milliseconds 900
+$logPath = Join-Path $appDir "data\endorvpn.log"
+if (Test-Path $logPath) { Get-Content $logPath | Select-Object -Last 25 | ForEach-Object { Write-Host $_ } }
+
+# language switch -> EN
+Invoke-ById "BtnEn" | Out-Null
+Start-Sleep -Milliseconds 1200
 Shot "shot-2-main-en.png"
-# open settings
-[WinApi]::Click(($rect.Right - 74), ($rect.Top + 27))
+
+# settings sheet
+Invoke-ById "BtnSettings" | Out-Null
 Start-Sleep -Milliseconds 1200
 Shot "shot-3-settings.png"
-# close settings
-[WinApi]::Click(($rect.Right - 370), ($rect.Top + 150))
-Start-Sleep -Milliseconds 700
-# click a country row (first row ~ y + 300)
-[WinApi]::Click(($rect.Left + 200), ($rect.Top + 330))
-Start-Sleep -Milliseconds 800
+Invoke-ById "BtnSettings" | Out-Null
+Start-Sleep -Milliseconds 900
+
+# pick the first country row by clicking its centre
+$rowCond = New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::ListItem)
+$row = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $rowCond)
+if ($row -ne $null) {
+  $r = $row.Current.BoundingRectangle
+  Add-Type -AssemblyName System.Windows.Forms
+  [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point([int]($r.X + 40), [int]($r.Y + $r.Height / 2))
+  Start-Sleep -Milliseconds 200
+  Add-Type -MemberDefinition '[DllImport("user32.dll")] public static extern void mouse_event(uint f, uint dx, uint dy, uint d, UIntPtr e);' -Name M -Namespace W | Out-Null
+  [W.M]::mouse_event(0x0002,0,0,0,[UIntPtr]::Zero)
+  Start-Sleep -Milliseconds 80
+  [W.M]::mouse_event(0x0004,0,0,0,[UIntPtr]::Zero)
+  Write-Host "clicked country row at $($r.X + 40),$($r.Y + $r.Height / 2)"
+} else {
+  Write-Host "UIA: no country row found"
+}
+Start-Sleep -Milliseconds 900
 Shot "shot-4-country-selected.png"
 
-# connect flow
-[WinApi]::Click(($rect.Left + [int](($rect.Right - $rect.Left) / 2)), ($rect.Top + 150))
-Start-Sleep -Seconds 3
+# connect via the big power button
+Invoke-ById "PowerButton" | Out-Null
+Start-Sleep -Seconds 4
 Shot "shot-5-connecting.png"
-Start-Sleep -Seconds 22
+Start-Sleep -Seconds 25
 Shot "shot-6-connected.png"
+
 Write-Host "---- app log after connect ----"
-$logPath = Join-Path (Split-Path $full -Parent) "data\endorvpn.log"
-if (Test-Path $logPath) { Copy-Item $logPath (Join-Path $OutDir "ui-app.log") -Force; Get-Content $logPath | Select-Object -Last 45 | ForEach-Object { Write-Host $_ } }
+if (Test-Path $logPath) {
+  Copy-Item $logPath (Join-Path $OutDir "ui-app.log") -Force
+  Get-Content $logPath | Select-Object -Last 45 | ForEach-Object { Write-Host $_ }
+}
 if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force }

@@ -6,9 +6,9 @@ PASS i18n.country.en :: Russia
 PASS flags.count :: 271
 PASS flags.ru
 PASS flags.jp
-PASS servers.parse :: 21
+PASS servers.parse :: 27
 PASS servers.countries
-PASS book.countries :: 12
+PASS book.countries :: 17
 PASS book.smartpick
 PASS book.ranking
 PASS book.rubest
@@ -30,10 +30,10 @@ PASS admin
 PASS json.escape
 
 ---- log ----
-2026-11-08 20:42:31.125 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
-2026-11-08 20:42:31.735 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
-2026-11-08 20:42:31.739 [INFO] parsed 21 servers
-2026-11-08 20:42:33.585 [INFO] server book: 21 servers in 12 countries
-2026-11-08 20:42:34.886 [INFO] server cache saved, 23 chars
-2026-11-08 20:42:34.892 [INFO] smoke exit 0
+2026-11-08 20:48:00.713 [INFO] === EndorVPN 1.0.0 starting (admin=True) ===
+2026-11-08 20:48:00.924 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
+2026-11-08 20:48:00.930 [INFO] parsed 27 servers
+2026-11-08 20:48:01.007 [INFO] server book: 27 servers in 17 countries
+2026-11-08 20:48:01.061 [INFO] server cache saved, 23 chars
+2026-11-08 20:48:01.067 [INFO] smoke exit 0
 

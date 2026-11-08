@@ -1,0 +1,36 @@
+**********************
+PowerShell transcript start
+Start time: 20261108204924
+Username: runnervmm7ud1\runneradmin
+RunAs User: runnervmm7ud1\runneradmin
+Configuration Name: 
+Machine: runnervmm7ud1 (Microsoft Windows NT 10.0.26100.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\b5a9af23-4c35-47a2-9334-c401311453e1.ps1'
+Process ID: 3924
+PSVersion: 7.6.9
+PSEdition: Core
+GitCommitId: 7.6.9
+OS: Microsoft Windows 10.0.26100
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+zip attempt 1 failed: Exception calling "CreateFromDirectory" with "4" argument(s): "The process cannot access the file 'D:\a\222\222\dist\EndorVPN\data\work\openvpn.log' because it is being used by another process."
+zip attempt 2 failed: Exception calling "CreateFromDirectory" with "4" argument(s): "The file 'D:\a\222\222\dist\EndorVPN-win64.zip' already exists."
+zip attempt 3 failed: Exception calling "CreateFromDirectory" with "4" argument(s): "The file 'D:\a\222\222\dist\EndorVPN-win64.zip' already exists."
+PS>TerminatingError(): "could not create zip"
+>> TerminatingError(): "could not create zip"
+Exception: D:\a\_temp\b5a9af23-4c35-47a2-9334-c401311453e1.ps1:20
+Line |
+  20 |  if (-not $ok) { throw "could not create zip" }
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | could not create zip
+
+PS>$global:?
+False
+**********************
+PowerShell transcript end
+End time: 20261108204942
+**********************

@@ -236,6 +236,7 @@ namespace EndorVPN
 
         private void ShowEmptyServers()
         {
+            Program.Log.Warn("show empty servers state");
             EmptyState.Visibility = Visibility.Visible;
             EmptyTitle.Text = Loc.T("picker.noservers");
             EmptyHint.Text = Loc.T("picker.noservers.hint");
@@ -570,6 +571,7 @@ namespace EndorVPN
             CountryList.Children.Add(BuildTabHeader(ranking.Count));
             foreach (var c in ranking) CountryList.Children.Add(BuildCountryRow(c));
 
+            Program.Log.Info("render: servers=" + _book.Servers.Count + " ranking=" + ranking.Count + " filter=" + _filter + " search='" + _search + "'");
             if (ranking.Count > 0) MarkUiReady();
             EmptyState.Visibility = ranking.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             if (ranking.Count == 0 && _book.Servers.Count > 0)

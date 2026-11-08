@@ -1,11 +1,19 @@
   Determining projects to restore...
-  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 120 ms).
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml(73,56): error MC3000: 'The '=' character, hexadecimal value 0x3D, cannot be included in a name. Line 73, position 56.' XML is not valid. [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 190 ms).
+D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(39,26): error CS0246: The type or namespace name 'HttpClient' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1081,56): error CS0246: The type or namespace name 'CancelEventArgs' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\UI\Theme.cs(68,33): error CS0102: The type 'Theme' already contains a definition for 'Text' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 
 Build FAILED.
 
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml(73,56): error MC3000: 'The '=' character, hexadecimal value 0x3D, cannot be included in a name. Line 73, position 56.' XML is not valid. [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(6,18): error CS0234: The type or namespace name 'Http' does not exist in the namespace 'System.Net' (are you missing an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\IpChecker.cs(39,26): error CS0246: The type or namespace name 'HttpClient' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1081,56): error CS0246: The type or namespace name 'CancelEventArgs' could not be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\UI\Theme.cs(68,33): error CS0102: The type 'Theme' already contains a definition for 'Text' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
     0 Warning(s)
-    1 Error(s)
+    5 Error(s)
 
-Time Elapsed 00:00:05.65
+Time Elapsed 00:00:20.32

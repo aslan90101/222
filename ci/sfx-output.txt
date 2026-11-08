@@ -1,12 +1,12 @@
 **********************
 PowerShell transcript start
-Start time: 20261108221647
+Start time: 20261108222137
 Username: runnervmm7ud1\runneradmin
 RunAs User: runnervmm7ud1\runneradmin
 Configuration Name: 
 Machine: runnervmm7ud1 (Microsoft Windows NT 10.0.26100.0)
-Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\76cc555c-255e-437d-a3d3-911c0ec520a7.ps1'
-Process ID: 9184
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\f43c8e03-7f39-4766-b443-09837cb40792.ps1'
+Process ID: 8016
 PSVersion: 7.6.9
 PSEdition: Core
 GitCommitId: 7.6.9
@@ -25,7 +25,8 @@ D:\a\222\222\setup\Setup.csproj(23,5): error MSB4232: Items that are outside Tar
     0 Warning(s)
     1 Error(s)
 
-Time Elapsed 00:00:00.06
+Time Elapsed 00:00:00.07
+---- stub build output ----
 D:\a\222\222\setup\Setup.csproj(23,5): error MSB4232: Items that are outside Target elements must have one of the following operations: Include, Update, or Remove.
 
 Build FAILED.
@@ -34,12 +35,12 @@ D:\a\222\222\setup\Setup.csproj(23,5): error MSB4232: Items that are outside Tar
     0 Warning(s)
     1 Error(s)
 
-Time Elapsed 00:00:00.06
+Time Elapsed 00:00:00.07
 PS>TerminatingError(): "stub build failed"
 >> TerminatingError(): "stub build failed"
-Exception: D:\a\_temp\76cc555c-255e-437d-a3d3-911c0ec520a7.ps1:8
+Exception: D:\a\_temp\f43c8e03-7f39-4766-b443-09837cb40792.ps1:9
 Line |
-   8 |  … \x64\Release\net48\EndorVPN-Setup.exe)) { throw "stub build failed" }
+   9 |  … \x64\Release\net48\EndorVPN-Setup.exe)) { throw "stub build failed" }
      |                                              ~~~~~~~~~~~~~~~~~~~~~~~~~
      | stub build failed
 
@@ -47,5 +48,5 @@ PS>$global:?
 False
 **********************
 PowerShell transcript end
-End time: 20261108221650
+End time: 20261108222140
 **********************

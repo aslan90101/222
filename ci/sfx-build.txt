@@ -1,0 +1,9 @@
+D:\a\222\222\setup\Setup.csproj(23,5): error MSB4232: Items that are outside Target elements must have one of the following operations: Include, Update, or Remove.
+
+Build FAILED.
+
+D:\a\222\222\setup\Setup.csproj(23,5): error MSB4232: Items that are outside Target elements must have one of the following operations: Include, Update, or Remove.
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.07

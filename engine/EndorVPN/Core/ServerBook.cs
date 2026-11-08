@@ -142,8 +142,11 @@ namespace EndorVPN.Core
         /// <summary>Best overall server, used by smart pick and auto-connect.</summary>
         public VpnServer SmartPick()
         {
+            // VPN Gate volunteers answer AUTH_FAILED for many client networks,
+            // VPNBook's pool does not. Reliable beats theoretically faster.
             return Servers
-                .OrderBy(s => s._measuredPing > 0 ? s._measuredPing : (s.Ping > 0 ? s.Ping : 9000))
+                .OrderBy(s => string.Equals(s.Provider, "vpnbook", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .ThenBy(s => s._measuredPing > 0 ? s._measuredPing : (s.Ping > 0 ? s.Ping : 9000))
                 .ThenByDescending(s => s.SpeedBps)
                 .ThenBy(s => s.Sessions)
                 .FirstOrDefault();

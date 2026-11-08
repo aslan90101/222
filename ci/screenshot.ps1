@@ -123,6 +123,8 @@ Start-Sleep -Milliseconds 900
 Shot "shot-4-country-selected.png"
 
 # connect via the big power button
+$logStart = 0
+if (Test-Path $logPath) { $logStart = (Get-Item $logPath).Length }
 Invoke-ById "PowerButton" | Out-Null
 Start-Sleep -Seconds 4
 Shot "shot-5-connecting.png"
@@ -131,8 +133,16 @@ $connected = $false
 for ($i = 0; $i -lt 60; $i++) {
   Start-Sleep -Seconds 2
   if (Test-Path $logPath) {
-    $hit = Select-String -Path $logPath -Pattern "tunnel up via" -Quiet
-    if ($hit) { $connected = $true; break }
+    $fs = [System.IO.File]::Open($logPath, 'Open', 'Read', 'ReadWrite')
+    try {
+      if ($fs.Length -gt $logStart) {
+        $fs.Seek($logStart, 'Begin') | Out-Null
+        $sr = New-Object System.IO.StreamReader($fs)
+        $tail = $sr.ReadToEnd()
+        if ($tail -match "tunnel up via") { $connected = $true }
+      }
+    } finally { $fs.Dispose() }
+    if ($connected) { break }
   }
 }
 Write-Host "connected=$connected"

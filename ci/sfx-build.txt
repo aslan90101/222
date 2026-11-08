@@ -1,9 +1,9 @@
   Determining projects to restore...
-  Restored D:\a\222\222\setup\Setup.csproj (in 98 ms).
+  Restored D:\a\222\222\setup\Setup.csproj (in 74 ms).
   Setup -> D:\a\222\222\setup\bin\x64\Release\net48\EndorVPN-Setup.exe
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:01.38
+Time Elapsed 00:00:01.02

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EndorVPN</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ===== title bar ===== -->
+  <header class="titlebar" id="titlebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 2.6 3.8 5.9v5.5c0 5 3.5 9.6 8.2 10.9 4.7-1.3 8.2-5.9 8.2-10.9V5.9L12 2.6Z" fill="currentColor"/><path d="M12 6.1 6.4 8.3v3.1c0 3.3 2.3 6.4 5.6 7.4 3.3-1 5.6-4.1 5.6-7.4V8.3L12 6.1Z" fill="var(--bg-elev)"/><path d="M10.9 14.3 8.8 12.2l-1.1 1.1 3.2 3.2 5-5-1.1-1.1-3.9 3.9Z" fill="currentColor"/></svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">EndorVPN</span>
+        <span class="brand-tag" data-i18n="brand.tag">бесплатный · без рекламы</span>
+      </div>
+    </div>
+    <div class="titlebar-actions">
+      <div class="seg-lang" role="group" aria-label="Language">
+        <button class="seg-btn" data-lang="ru" title="Русский">RU</button>
+        <button class="seg-btn" data-lang="en" title="English">EN</button>
+      </div>
+      <button class="icon-btn" id="btnSettings" data-i18n-title="nav.settings" title="Настройки">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19.4 13a7.9 7.9 0 0 0 .05-.98c0-.33-.02-.66-.06-.99l2.1-1.64a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.48 1a7.3 7.3 0 0 0-1.7-1l-.38-2.64A.5.5 0 0 0 13.96 2h-4a.5.5 0 0 0-.5.42L9.1 5.07c-.6.25-1.17.58-1.7.98L4.9 5.06a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64l2.1 1.65c-.04.33-.06.66-.06.99 0 .33.02.66.06.98l-2.1 1.65a.5.5 0 0 0-.12.64l2 3.46c.13.22.38.31.6.22l2.48-1c.53.4 1.1.73 1.7.98l.36 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65a7.3 7.3 0 0 0 1.7-.98l2.48 1c.22.09.47 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64L19.4 13ZM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg>
+      </button>
+      <button class="icon-btn" id="btnMin" title="Minimize">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 11h14v2H5z" fill="currentColor"/></svg>
+      </button>
+      <button class="icon-btn icon-btn--close" id="btnClose" title="Close">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6 10.6 12 5 6.4 6.4 5Z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- ===== hero / status ===== -->
+    <section class="hero">
+      <div class="glow" id="glow" aria-hidden="true"></div>
+
+      <div class="status-line">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText" data-i18n="status.disconnected">Не подключено</span>
+        <button class="status-loc" id="statusLoc" hidden>
+          <img id="statusLocFlag" alt="" /><span id="statusLocName">—</span>
+        </button>
+      </div>
+
+      <button class="power" id="powerBtn" aria-label="Connect">
+        <span class="power-ring"></span>
+        <span class="power-core">
+          <svg viewBox="0 0 24 24" width="34" height="34" id="powerIcon"><path d="M12 3v8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.7 6.9a7.5 7.5 0 1 0 10.6 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </span>
+      </button>
+      <div class="power-hint" id="powerHint" data-i18n="hero.hint">Нажмите, чтобы подключиться</div>
+
+      <div class="ip-card">
+        <div class="ip-col">
+          <div class="ip-label" data-i18n="ip.real">Ваш IP</div>
+          <div class="ip-value" id="realIp">—</div>
+        </div>
+        <div class="ip-arrow" id="ipArrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 12h14m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="ip-col">
+          <div class="ip-label" data-i18n="ip.vpn">IP через VPN</div>
+          <div class="ip-value ip-value--accent" id="vpnIp">—</div>
+        </div>
+        <div class="ip-actions">
+          <button class="ghost-btn" id="btnCheckIp" data-i18n="ip.refresh">Обновить</button>
+        </div>
+      </div>
+
+      <div class="metrics" id="metrics">
+        <div class="metric">
+          <div class="metric-ico metric-ico--down">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 4v12m0 0 5-5m-5 5-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="metric-value" id="mDown">0 <small>Mbps</small></div>
+            <div class="metric-label" data-i18n="metrics.down">Скорость ↓</div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-ico metric-ico--up">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 20V8m0 0 5 5m-5-5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="metric-value" id="mUp">0 <small>Mbps</small></div>
+            <div class="metric-label" data-i18n="metrics.up">Скорость ↑</div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-ico metric-ico--time">
+            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="metric-value" id="mTime">00:00</div>
+            <div class="metric-label" data-i18n="metrics.session">Сессия</div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-ico metric-ico--traffic">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 4h7l4 4v12H7V4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9.5 11h6M9.5 14.5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="metric-value" id="mTraffic">0 <small>MB</small></div>
+            <div class="metric-label" data-i18n="metrics.traffic">Трафик</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== countries ===== -->
+    <section class="picker">
+      <div class="picker-head">
+        <div class="picker-title">
+          <h2 data-i18n="picker.title">Выбор страны</h2>
+          <span class="badge" id="serverCountBadge">0</span>
+        </div>
+        <div class="picker-tools">
+          <div class="search">
+            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="searchInput" type="text" data-i18n-ph="picker.search" placeholder="Найти страну" spellcheck="false" autocomplete="off" />
+            <button class="search-clear" id="searchClear" hidden aria-label="Clear">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6 10.6 12 5 6.4 6.4 5Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <button class="chip" id="btnSmart" data-i18n="picker.smart" title="">⚡ <span data-i18n="picker.smartLabel">Умный выбор</span></button>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab tab--active" data-filter="all" data-i18n="tabs.all">Все</button>
+        <button class="tab" data-filter="fast" data-i18n="tabs.fast">Быстрые</button>
+        <button class="tab" data-filter="favorite" data-i18n="tabs.favorites">Избранные</button>
+        <button class="tab" data-filter="nearby" data-i18n="tabs.nearby">Рядом</button>
+      </div>
+
+      <div class="country-list" id="countryList" role="listbox"></div>
+
+      <div class="empty" id="emptyState" hidden>
+        <div class="empty-ico">🌐</div>
+        <div class="empty-title" data-i18n="picker.emptyTitle">Ничего не найдено</div>
+        <div class="empty-sub" data-i18n="picker.emptySub">Попробуйте изменить запрос</div>
+      </div>
+
+      <div class="list-skeleton" id="skeleton">
+        <div class="sk-row"></div><div class="sk-row"></div><div class="sk-row"></div>
+        <div class="sk-row"></div><div class="sk-row"></div><div class="sk-row"></div>
+      </div>
+
+      <div class="list-foot">
+        <button class="link-btn" id="btnRefresh" data-i18n="picker.refresh">Обновить список серверов</button>
+        <span class="list-foot-sep">·</span>
+        <span class="list-foot-note" id="lastUpdated" data-i18n="picker.never">ещё не загружали</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== settings sheet ===== -->
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <aside class="sheet" id="settingsSheet" hidden aria-label="Settings">
+    <div class="sheet-head">
+      <h3 data-i18n="settings.title">Настройки</h3>
+      <button class="icon-btn" id="btnCloseSettings">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6 10.6 12 5 6.4 6.4 5Z" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <div class="field-label" data-i18n="settings.language">Язык интерфейса</div>
+        <div class="seg-lang seg-lang--wide">
+          <button class="seg-btn" data-lang="ru">Русский</button>
+          <button class="seg-btn" data-lang="en">English</button>
+        </div>
+      </div>
+
+      <label class="toggle-row">
+        <div>
+          <div class="toggle-title" data-i18n="settings.killswitch">Kill-switch</div>
+          <div class="toggle-sub" data-i18n="settings.killswitchSub">Блокировать интернет при обрыве туннеля</div>
+        </div>
+        <input type="checkbox" id="optKillswitch" class="switch" checked />
+      </label>
+
+      <label class="toggle-row">
+        <div>
+          <div class="toggle-title" data-i18n="settings.autoconnect">Автоподключение</div>
+          <div class="toggle-sub" data-i18n="settings.autoconnectSub">Подключаться при запуске EndorVPN</div>
+        </div>
+        <input type="checkbox" id="optAutoconnect" class="switch" />
+      </label>
+
+      <label class="toggle-row">
+        <div>
+          <div class="toggle-title" data-i18n="settings.launch">Запускать с Windows</div>
+          <div class="toggle-sub" data-i18n="settings.launchSub">Добавить в автозагрузку</div>
+        </div>
+        <input type="checkbox" id="optLaunch" class="switch" />
+      </label>
+
+      <div class="field">
+        <div class="field-label" data-i18n="settings.protocol">Транспорт</div>
+        <div class="seg-lang seg-lang--wide" id="protoSeg">
+          <button class="seg-btn" data-proto="auto" data-i18n="settings.protoAuto">Авто</button>
+          <button class="seg-btn" data-proto="tcp" data-i18n="settings.protoTcp">TCP 443</button>
+          <button class="seg-btn" data-proto="udp" data-i18n="settings.protoUdp">UDP</button>
+        </div>
+        <div class="field-hint" data-i18n="settings.protoHint">TCP надёжнее при блокировках, UDP быстрее.</div>
+      </div>
+
+      <div class="field">
+        <div class="field-label" data-i18n="settings.servers">Серверы</div>
+        <div class="kv">
+          <span data-i18n="settings.provider">Источники</span>
+          <span class="kv-val">VPN Gate · VPNBook</span>
+        </div>
+        <div class="kv">
+          <span data-i18n="settings.engine">Движок</span>
+          <span class="kv-val" id="engineVersion">OpenVPN</span>
+        </div>
+        <div class="kv">
+          <span data-i18n="settings.version">Версия</span>
+          <span class="kv-val" id="appVersion">1.0.0</span>
+        </div>
+      </div>
+
+      <button class="danger-btn" id="btnUninstallTap" data-i18n="settings.removeTap">Удалить сетевой драйвер EndorVPN</button>
+      <div class="field-hint small" data-i18n="settings.removeTapHint">Удаляет TAP-адаптер из системы. VPN перестанет работать до повторной установки.</div>
+
+      <div class="sheet-foot">
+        <span data-i18n="settings.madeWith">Сделано с ♥ для свободного интернета</span>
+        <span>MIT</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== logs drawer (hidden by default) ===== -->
+  <div class="logsheet" id="logSheet" hidden>
+    <div class="logsheet-head">
+      <span data-i18n="logs.title">Журнал подключения</span>
+      <button class="ghost-btn" id="btnCopyLog" data-i18n="logs.copy">Копировать</button>
+    </div>
+    <pre id="logBody"></pre>
+  </div>
+
+  <!-- ===== first-run admin prompt ===== -->
+  <div class="modal-backdrop" id="adminModal" hidden>
+    <div class="modal">
+      <div class="modal-ico">🛡️</div>
+      <h3 data-i18n="admin.title">Нужны права администратора</h3>
+      <p data-i18n="admin.text">Чтобы менять IP всего компьютера, EndorVPN устанавливает сетевой драйвер и меняет маршруты. Запустите приложение от имени администратора.</p>
+      <button class="primary-btn" id="btnRestartAdmin" data-i18n="admin.restart">Перезапустить от администратора</button>
+      <button class="link-btn" id="btnAdminLater" data-i18n="admin.later">Позже</button>
+    </div>
+  </div>
+
+  <!-- ===== toast ===== -->
+  <div class="toasts" id="toasts"></div>
+</div>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

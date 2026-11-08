@@ -1,21 +1,14 @@
   Determining projects to restore...
-  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 126 ms).
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(112,25): error CS0841: Cannot use local variable 'attempt' before it is declared [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(114,44): error CS0841: Cannot use local variable 'attempt' before it is declared [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(115,25): error CS0136: A local or parameter named 'attempt' cannot be declared in this scope because that name is used in an enclosing local scope to define a local or parameter [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(108,21): warning CS0219: The variable 'attempt' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1217,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 127 ms).
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1233,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+  EndorVPN -> D:\a\222\222\engine\EndorVPN\bin\x64\Release\net48\EndorVPN.exe
 
-Build FAILED.
+Build succeeded.
 
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(108,21): warning CS0219: The variable 'attempt' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1217,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1233,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(112,25): error CS0841: Cannot use local variable 'attempt' before it is declared [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(114,44): error CS0841: Cannot use local variable 'attempt' before it is declared [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(115,25): error CS0136: A local or parameter named 'attempt' cannot be declared in this scope because that name is used in an enclosing local scope to define a local or parameter [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-    3 Warning(s)
-    3 Error(s)
+    2 Warning(s)
+    0 Error(s)
 
-Time Elapsed 00:00:07.82
+Time Elapsed 00:00:17.29

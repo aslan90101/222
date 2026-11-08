@@ -107,7 +107,8 @@ jobs:
           Get-Process openvpn -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
           Start-Sleep -Seconds 2
           dotnet build setup\Setup.csproj -c Release /p:Platform=x64 -v minimal *>&1 | Tee-Object -FilePath ci/sfx-build.txt
-          Get-Content ci/sfx-build.txt | Select-Object -Last 25 | ForEach-Object { Write-Host $_ }
+          Write-Host "---- stub build output ----"
+          if (Test-Path ci/sfx-build.txt) { Get-Content ci/sfx-build.txt | Select-Object -Last 30 | ForEach-Object { Write-Host $_ } }
           if ($LASTEXITCODE -ne 0 -or -not (Test-Path setup\bin\x64\Release\net48\EndorVPN-Setup.exe)) { throw "stub build failed" }
           ./setup/pack-sfx.ps1 -Stub setup\bin\x64\Release\net48\EndorVPN-Setup.exe -AppDir dist\EndorVPN -Out dist\EndorVPN.exe
           if (-not (Test-Path dist\EndorVPN.exe)) { throw "single-file build failed" }
@@ -206,6 +207,7 @@ jobs:
           if (Test-Path ci/verify-output.txt) { git add -f ci/verify-output.txt }
           if (Test-Path ci/zip-output.txt) { git add -f ci/zip-output.txt }
           if (Test-Path ci/sfx-output.txt) { git add -f ci/sfx-output.txt }
+          if (Test-Path ci/sfx-build.txt) { git add -f ci/sfx-build.txt }
           if (Test-Path ci/reports/e2e.json) { git add -f ci/reports/e2e.json }
           Get-ChildItem ci\reports\*.* -ErrorAction SilentlyContinue | ForEach-Object { git add -f $_.FullName.Replace($PWD.Path + "\", "").Replace("\", "/") }
           git commit -m "ci: build output" | Out-Null

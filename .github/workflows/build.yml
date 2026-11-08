@@ -60,7 +60,7 @@ jobs:
         shell: pwsh
         run: |
           $eng = "dist\EndorVPN\engine"
-          $required = @("openvpn.exe","tapctl.exe","libpkcs11-helper-1.dll","libcrypto-3-x64.dll","libssl-3-x64.dll","liblzo2-2.dll","vcruntime140.dll","drivers\tap-windows-installer.exe")
+          $required = @("openvpn.exe","tapctl.exe","libpkcs11-helper-1.dll","libcrypto-3-x64.dll","libssl-3-x64.dll","vcruntime140.dll","drivers\tap-windows-installer.exe")
           $missing = @()
           foreach ($r in $required) { if (-not (Test-Path (Join-Path $eng $r))) { $missing += $r } }
           Write-Host "engine files:"; Get-ChildItem $eng -Recurse -File | ForEach-Object { Write-Host ("  " + $_.Name) }

@@ -1,5 +1,5 @@
   Determining projects to restore...
-  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 204 ms).
+  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 228 ms).
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1127,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
   EndorVPN -> D:\a\222\222\engine\EndorVPN\bin\x64\Release\net48\EndorVPN.exe
@@ -11,4 +11,4 @@ D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'M
     2 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:16.72
+Time Elapsed 00:00:10.90

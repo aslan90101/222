@@ -17,6 +17,9 @@ namespace EndorVPN.Core
         public string Detail;
         public IpInfo Ip;
         public VpnServer Server;
+
+        /// <summary>The user aborted the attempt; do not report it as a failure.</summary>
+        public bool Cancelled;
     }
 
     /// <summary>
@@ -66,13 +69,16 @@ namespace EndorVPN.Core
         public TapManager Tap { get { return _tap; } }
 
         /// <summary>How long a single server gets to come up before we move on.</summary>
-        public int AttemptTimeoutSec = 18;
+        public int AttemptTimeoutSec = 15;
 
         /// <summary>Hard cap on attempts in one ConnectAsync call.</summary>
-        public int MaxAttempts = 5;
+        public int MaxAttempts = 3;
 
         /// <summary>Set by the log pump when the peer rejects our credentials.</summary>
         private volatile bool _authRejected;
+
+        /// <summary>Set when the user aborts the attempt from the UI.</summary>
+        private volatile bool _cancelled;
 
         public async Task<ConnectResult> ConnectAsync(VpnServer server, AppSettings settings, IList<VpnServer> alternatives, CancellationToken ct)
         {
@@ -83,6 +89,7 @@ namespace EndorVPN.Core
                 SetState(State.Connecting);
             }
             _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            _cancelled = false;
 
             var result = new ConnectResult { Server = server };
             try
@@ -101,7 +108,7 @@ namespace EndorVPN.Core
                 {
                     foreach (var alt in alternatives)
                     {
-                        if (candidates.Count >= 3) break;
+                        if (candidates.Count >= MaxAttempts) break;
                         if (alt == null) continue;
                         if (candidates.Any(c => c.Ip == alt.Ip)) continue;
                         candidates.Add(alt);
@@ -116,6 +123,14 @@ namespace EndorVPN.Core
                     Stage(Loc.T("stage.tunnel") + " · " + candidate.Host);
                     _log.Info("attempt " + attemptNo + ": " + candidate.Host + " (" + candidate.CountryCode + ")");
                     var attempt = await TryServerAsync(candidate, settings, _cts.Token).ConfigureAwait(false);
+                    if (_cancelled)
+                    {
+                        result.Ok = false;
+                        result.Cancelled = true;
+                        StopProcess();
+                        SetState(State.Idle);
+                        return result;
+                    }
                     if (attempt.Ok)
                     {
                         ActiveServer = candidate;
@@ -130,6 +145,7 @@ namespace EndorVPN.Core
                 }
 
                 result.Ok = false;
+                result.Cancelled = _cancelled;
                 SetState(State.Idle);
                 if (settings.KillSwitch) _killSwitch.Disable();
                 return result;
@@ -137,7 +153,8 @@ namespace EndorVPN.Core
             catch (OperationCanceledException)
             {
                 result.Ok = false;
-                result.ErrorKey = "err.timeout";
+                result.Cancelled = true;
+                result.ErrorKey = "err.cancelled";
                 SetState(State.Idle);
                 if (settings.KillSwitch) _killSwitch.Disable();
                 return result;
@@ -339,21 +356,32 @@ namespace EndorVPN.Core
             return offset;
         }
 
+        /// <summary>
+        /// Stops whatever is running and returns to Idle. Safe to call while a
+        /// connection attempt is mid-flight: the attempt's own continuation sees
+        /// the cancelled token and bails out without resurrecting the UI state.
+        /// </summary>
         public void Disconnect()
         {
+            bool wasBusy;
             lock (_sync)
             {
-                if (CurrentState == State.Idle) return;
-                SetState(State.Disconnecting);
+                wasBusy = CurrentState != State.Idle;
             }
+            _cancelled = true;
             try { if (_cts != null) _cts.Cancel(); } catch { }
             StopProcess();
             _killSwitch.Disable();
             ActiveServer = null;
             ActiveIp = null;
+            try { if (_cts != null) _cts.Dispose(); } catch { }
+            _cts = null;
             SetState(State.Idle);
-            _log.Info("disconnected");
+            if (wasBusy) _log.Info("connect cancelled / disconnected");
         }
+
+        /// <summary>True once Disconnect() was requested for the running attempt.</summary>
+        public bool IsCancelling { get { return _cancelled; } }
 
         private void StopProcess()
         {

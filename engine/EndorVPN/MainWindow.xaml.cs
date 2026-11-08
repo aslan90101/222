@@ -452,11 +452,12 @@ namespace EndorVPN
             }
 
             string hintKey = _state == VpnEngine.State.Connected ? "hero.hint.disconnect"
-                : _state == VpnEngine.State.Connecting || _state == VpnEngine.State.Disconnecting ? "hero.hint.busy"
+                : _state == VpnEngine.State.Connecting ? "hero.hint.cancel"
+                : _state == VpnEngine.State.Disconnecting ? "hero.hint.busy"
                 : string.IsNullOrEmpty(_selectedCountry) ? "hero.hint.nocountry" : "hero.hint.connect";
             PowerHint.Text = (_stageLive && !string.IsNullOrEmpty(_stage) &&
                               (_state == VpnEngine.State.Connecting || _state == VpnEngine.State.Disconnecting))
-                ? _stage : Loc.T(hintKey);
+                ? _stage + Loc.T("hero.hint.cancelsuffix") : Loc.T(hintKey);
             if (_state == VpnEngine.State.Idle || _state == VpnEngine.State.Connected) _stageLive = false;
 
             Grid.SetRowSpan(ToastHost, 1);
@@ -507,8 +508,15 @@ namespace EndorVPN
 
         private async void PowerButton_Click(object sender, RoutedEventArgs e)
         {
+            // Escape hatch first: while connecting, the same button aborts the
+            // attempt immediately instead of being swallowed by the busy guard.
+            if (_state == VpnEngine.State.Connecting)
+            {
+                AbortConnect();
+                return;
+            }
             if (_busy) return;
-            if (_state == VpnEngine.State.Connected || _state == VpnEngine.State.Connecting)
+            if (_state == VpnEngine.State.Connected)
             {
                 _opCts?.Cancel();
                 _engine.Disconnect();
@@ -531,11 +539,27 @@ namespace EndorVPN
             await ConnectAsync(server, country);
         }
 
+        /// <summary>
+        /// Cancels an in-flight connection attempt: kills openvpn, drops the
+        /// arrows/pulse animation and puts the UI back to a usable idle state at
+        /// once, without waiting for the engine's process teardown.
+        /// </summary>
+        private void AbortConnect()
+        {
+            if (_state != VpnEngine.State.Connecting && !_busy) return;
+            Program.Log.Info("user cancelled the connection attempt");
+            try { _opCts?.Cancel(); } catch { }
+            _stageLive = false;
+            SetState(VpnEngine.State.Idle);
+            RefreshHero();
+            Toast(Loc.T("toast.cancelled"), ToastKind.Info);
+            try { _engine.Disconnect(); } catch { }
+        }
+
         private async Task ConnectAsync(VpnServer server, string country)
         {
             if (_busy) return;
             _busy = true;
-            PowerButton.IsEnabled = false;
             _opCts = new CancellationTokenSource();
             _autoLastCountry = country;
             SetState(VpnEngine.State.Connecting);
@@ -545,6 +569,11 @@ namespace EndorVPN
                 var alternatives = OrderServers(country);
                 Program.Log.Info("connecting to " + country + " with " + alternatives.Count + " ranked candidates");
                 var result = await _engine.ConnectAsync(server, _settings, alternatives, _opCts.Token);
+                if (result.Cancelled || _state == VpnEngine.State.Idle)
+                {
+                    // the user pulled the plug; nothing to report
+                    return;
+                }
                 if (!result.Ok)
                 {
                     // Free VPN Gate nodes reject anonymous logins from many IPs.
@@ -558,10 +587,15 @@ namespace EndorVPN
                         SetState(VpnEngine.State.Connecting);
                         result = await _engine.ConnectAsync(fallback, _settings, new List<VpnServer> { fallback }, _opCts.Token);
                     }
+                    if (result.Cancelled)
+                    {
+                        SetState(VpnEngine.State.Idle);
+                        return;
+                    }
                     if (!result.Ok)
                     {
                         SetState(VpnEngine.State.Idle);
-                        Toast(Loc.T("err.unknown") + ": " + Loc.T(result.ErrorKey), ToastKind.Err);
+                        Toast(Loc.T("toast.failed") + ": " + Loc.T(result.ErrorKey), ToastKind.Err);
                     }
                 }
             }
@@ -570,6 +604,7 @@ namespace EndorVPN
                 _busy = false;
                 PowerButton.IsEnabled = true;
                 _opCts = null;
+                if (_state == VpnEngine.State.Connecting) SetState(VpnEngine.State.Idle);
                 UpdateServerBadge();
             }
         }

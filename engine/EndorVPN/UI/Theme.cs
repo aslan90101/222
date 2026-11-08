@@ -65,7 +65,7 @@ namespace EndorVPN.UI
             };
         }
 
-        public static TextBlock Text(string text, double size, Brush brush, FontWeight? weight = null)
+        public static TextBlock Label(string text, double size, Brush brush, FontWeight? weight = null)
         {
             return new TextBlock
             {
@@ -134,20 +134,6 @@ namespace EndorVPN.UI
             el.BeginAnimation(UIElement.OpacityProperty, anim);
         }
 
-        public static void Animate(double from, double to, Action<double> setter, int ms = 250, IEasingFunction easing = null)
-        {
-            var anim = new DoubleAnimation(from, to, TimeSpan.FromMilliseconds(ms))
-            {
-                EasingFunction = easing ?? new CubicEase { EasingMode = EasingMode.EaseOut },
-            };
-            var dummy = new AnimationClockProxy();
-            anim.Completed += (s, e) => setter(to);
-            var clock = anim.CreateClock();
-            clock.CurrentTimeInvalidated += (s, e) => setter(((AnimationClock)s).GetCurrentValue(0.0) is double d ? d : to);
-            // WPF animations only drive dependency properties; for plain numbers we
-            // fall back to a DispatcherTimer driven tween.
-            TweenHelper.Run(setter, from, to, ms, easing);
-        }
     }
 
     /// <summary>Minimal helper for animating arbitrary numbers (not DPs).</summary>
@@ -176,5 +162,4 @@ namespace EndorVPN.UI
         }
     }
 
-    internal sealed class AnimationClockProxy { }
 }

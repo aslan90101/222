@@ -23,6 +23,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="app.ico" LogicalName="EndorVPN.app.ico" />
     <None Include="..\..\engine\Flags\countries.json" Link="Assets\countries.json" CopyToOutputDirectory="Always" />
   </ItemGroup>

@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
+using System.ComponentModel;
 using System.Windows.Threading;
 using EndorVPN.Core;
 using EndorVPN.UI;
@@ -475,7 +476,7 @@ namespace EndorVPN
             var sp = new StackPanel();
             if (_search.Trim().Length > 0)
             {
-                var lbl = Theme.Text(Loc.T("picker.empty") == "Nothing found" ? "Found: " + count : "Найдено: " + count, 10.5, Theme.TextMuteBrush);
+                var lbl = Theme.Label(Loc.T("picker.empty") == "Nothing found" ? "Found: " + count : "Найдено: " + count, 10.5, Theme.TextMuteBrush);
                 lbl.Margin = new Thickness(2, 0, 0, 4);
                 sp.Children.Add(lbl);
             }
@@ -514,10 +515,10 @@ namespace EndorVPN
             Grid.SetColumn(flag, 0);
             grid.Children.Add(flag);
 
-            var name = Theme.Text(Loc.Country(c.Code, c.Name), 13, Theme.TextBrush, FontWeights.SemiBold);
+            var name = Theme.Label(Loc.Country(c.Code, c.Name), 13, Theme.TextBrush, FontWeights.SemiBold);
             var sub = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 0) };
             int n = c.Servers.Count;
-            sub.Children.Add(Theme.Text(n == 1 ? Loc.T("row.server.one") : Loc.T("row.server.many", n), 10, Theme.TextMuteBrush));
+            sub.Children.Add(Theme.Label(n == 1 ? Loc.T("row.server.one") : Loc.T("row.server.many", n), 10, Theme.TextMuteBrush));
             if (c.BestPing > 0 && c.BestPing < 2000)
             {
                 sub.Children.Add(new Border
@@ -525,7 +526,7 @@ namespace EndorVPN
                     Width = 3, Height = 3, CornerRadius = new CornerRadius(2), Background = Theme.Solid(Theme.TextMute),
                     Margin = new Thickness(5, 0, 5, 0), VerticalAlignment = VerticalAlignment.Center,
                 });
-                sub.Children.Add(Theme.Text(Loc.T("row.bestping", c.BestPing), 10, Theme.TextMuteBrush));
+                sub.Children.Add(Theme.Label(Loc.T("row.bestping", c.BestPing), 10, Theme.TextMuteBrush));
             }
             var main = new StackPanel();
             main.Children.Add(name);
@@ -863,7 +864,7 @@ namespace EndorVPN
             protoGrid.Children.Add(SettingsSegButton(Loc.T("settings.transport.udp"), _settings.Transport == "udp", () => SetTransport("udp")));
             protoBorder.Child = protoGrid;
             SettingsBody.Children.Add(protoBorder);
-            var protoHint = Theme.Text(Loc.T("settings.transport.hint"), 10.5, Theme.TextMuteBrush);
+            var protoHint = Theme.Label(Loc.T("settings.transport.hint"), 10.5, Theme.TextMuteBrush);
             protoHint.TextWrapping = TextWrapping.Wrap;
             protoHint.Margin = new Thickness(2, 0, 0, 16);
             SettingsBody.Children.Add(protoHint);
@@ -972,8 +973,8 @@ namespace EndorVPN
             var grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            var k = Theme.Text(key, 12, Theme.TextDimBrush);
-            var v = Theme.Text(value, 12, Theme.TextBrush, FontWeights.SemiBold);
+            var k = Theme.Label(key, 12, Theme.TextDimBrush);
+            var v = Theme.Label(value, 12, Theme.TextBrush, FontWeights.SemiBold);
             v.HorizontalAlignment = HorizontalAlignment.Right;
             Grid.SetColumn(v, 1);
             grid.Children.Add(k);

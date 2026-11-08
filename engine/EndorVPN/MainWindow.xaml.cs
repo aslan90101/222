@@ -93,7 +93,6 @@ namespace EndorVPN
             InitTray();
             SetState(VpnEngine.State.Idle);
             ShowAdminIfNeeded();
-            _ = BootstrapAsync();
         }
 
         // ===================================================================
@@ -114,6 +113,11 @@ namespace EndorVPN
             RootShell.Opacity = 0;
             await Task.Delay(30);
             Theme.FadeIn(RootShell, 260);
+
+            // The bootstrap must start here: only now is a Dispatcher
+            // SynchronizationContext installed, so every await below resumes
+            // on the UI thread instead of the thread pool.
+            await BootstrapAsync();
         }
 
         private async Task BootstrapAsync()
@@ -560,6 +564,11 @@ namespace EndorVPN
 
         private void RenderCountries()
         {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke((Action)RenderCountries);
+                return;
+            }
             try
             {
                 RenderCountriesCore();

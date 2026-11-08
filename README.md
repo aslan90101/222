@@ -13,16 +13,18 @@
 
 ## Скачать
 
-**[EndorVPN-win64.zip](https://github.com/aslan90101/222/releases/download/v1.0.0/EndorVPN-win64.zip)** — последний релиз.
+### ▸ [EndorVPN.exe](https://github.com/aslan90101/222/releases/download/v1.0.0/EndorVPN.exe) — один файл, 5.9 МБ
 
-1. Распакуйте архив в любую папку (например `C:\EndorVPN`).
-2. Запустите `EndorVPN.exe` **от имени администратора** (нужно для установки
-   TAP-драйвера и изменения таблицы маршрутизации). При первом запуске Windows
-   спросит подтверждение UAC — это нормально.
-3. Выберите страну и нажмите большую кнопку питания.
+Скачайте и запустите. Больше ничего не нужно: ни архива, ни установщика, ни
+отдельных драйверов.
 
-При первом подключении EndorVPN сам установит TAP-драйвер (входит в комплект,
-подпись OpenVPN). Больше ничего ставить не нужно.
+1. Запустите `EndorVPN.exe`, подтвердите запрос UAC (нужен для сетевого драйвера
+   и таблицы маршрутов).
+2. При первом запуске файл распакуется в `%LOCALAPPDATA%\EndorVPN` (около
+   секунды) и запустит интерфейс. Следующие запуски идут сразу в UI.
+3. Выберите страну и нажмите большую кнопку питания. TAP-драйвер поставится сам.
+
+Портативная папка вместо одного файла: **[EndorVPN-win64.zip](https://github.com/aslan90101/222/releases/download/v1.0.0/EndorVPN-win64.zip)** (распаковать и запустить `EndorVPN.exe` от администратора).
 
 ---
 
@@ -31,11 +33,19 @@
 A free Windows VPN client with a big country picker (flags + localized names),
 RU/EN UI and a real system-wide tunnel. No account, no ads, no analytics.
 
-1. Download **[EndorVPN-win64.zip](https://github.com/aslan90101/222/releases/download/v1.0.0/EndorVPN-win64.zip)** and unpack it anywhere.
-2. Run `EndorVPN.exe` **as administrator** (needed for the TAP driver and the
-   default route). The UAC prompt on first launch is expected.
-3. Pick a country, press the big power button. The TAP driver installs itself on
+### ▸ [EndorVPN.exe](https://github.com/aslan90101/222/releases/download/v1.0.0/EndorVPN.exe) — one file, 5.9 MB
+
+Download, run, confirm the UAC prompt. There is no installer and no separate
+driver download.
+
+1. On first launch the exe unpacks itself to `%LOCALAPPDATA%\EndorVPN` (takes
+   about a second) and opens the UI; later launches go straight to the UI.
+2. Pick a country, press the big power button. The TAP driver installs itself on
    the first connect.
+
+Portable folder alternative: **[EndorVPN-win64.zip](https://github.com/aslan90101/222/releases/download/v1.0.0/EndorVPN-win64.zip)**.
+
+> Windows SmartScreen may warn about an unsigned app: "More info" → "Run anyway".
 
 ---
 

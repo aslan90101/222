@@ -201,6 +201,8 @@ namespace EndorVPN.Core
                 RedirectStandardError = true,
             };
             _log.Info("starting: openvpn --config " + cfgPath);
+            _log.Info("engine dir: " + _paths.EngineDir + " (openvpn exists=" + File.Exists(openvpn) + ")");
+            _log.Info("config preview: " + config.Substring(0, Math.Min(600, config.Length)).Replace("\r\n", " / "));
 
             try
             {
@@ -225,7 +227,14 @@ namespace EndorVPN.Core
 
                 if (_proc.HasExited)
                 {
+                    string err = "";
+                    try { err = _proc.StandardError.ReadToEnd(); } catch { }
+                    string outp = "";
+                    try { outp = _proc.StandardOutput.ReadToEnd(); } catch { }
                     _log.Warn("openvpn exited with " + _proc.ExitCode);
+                    if (!string.IsNullOrWhiteSpace(err)) _log.Warn("openvpn stderr: " + err.Trim());
+                    if (!string.IsNullOrWhiteSpace(outp)) _log.Warn("openvpn stdout: " + outp.Trim());
+                    readOffset = PumpLog(logPath, 0);
                     break;
                 }
 

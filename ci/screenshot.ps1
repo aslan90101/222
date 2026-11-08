@@ -126,7 +126,17 @@ Shot "shot-4-country-selected.png"
 Invoke-ById "PowerButton" | Out-Null
 Start-Sleep -Seconds 4
 Shot "shot-5-connecting.png"
-Start-Sleep -Seconds 25
+# wait for the tunnel: poll the app log instead of guessing
+$connected = $false
+for ($i = 0; $i -lt 60; $i++) {
+  Start-Sleep -Seconds 2
+  if (Test-Path $logPath) {
+    $hit = Select-String -Path $logPath -Pattern "tunnel up via" -Quiet
+    if ($hit) { $connected = $true; break }
+  }
+}
+Write-Host "connected=$connected"
+Start-Sleep -Seconds 3
 Shot "shot-6-connected.png"
 
 Write-Host "---- app log after connect ----"

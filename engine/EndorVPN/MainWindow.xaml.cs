@@ -592,8 +592,13 @@ namespace EndorVPN
         {
             var c = _book.GetCountry(country);
             if (c == null) return new List<VpnServer>();
+            // VPN Gate volunteers frequently answer AUTH_FAILED (their public
+            // login is rate-limited per source IP), while VPNBook's small pool is
+            // stable. So a VPNBook node for the chosen country is tried first;
+            // the richer VPN Gate list stays as the wide-coverage fallback.
             return c.Servers
-                .OrderBy(x => x._measuredPing > 0 ? x._measuredPing : (x.Ping > 0 ? x.Ping : 8000))
+                .OrderBy(x => string.Equals(x.Provider, "vpnbook", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .ThenBy(x => x._measuredPing > 0 ? x._measuredPing : (x.Ping > 0 ? x.Ping : 8000))
                 .ThenByDescending(x => x.SpeedBps)
                 .ToList();
         }

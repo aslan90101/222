@@ -1,3 +1,4 @@
+using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -130,11 +131,12 @@ namespace EndorVPN
                 }
             }
 
-            // 2. fresh list from the network
-            await RefreshServersAsync(silent: _book.Servers.Count > 0);
+            // 2. public IP of the real connection (in parallel with the list)
+            var ipTask = LoadRealIpAsync();
 
-            // 3. public IP of the real connection
-            await LoadRealIpAsync();
+            // 3. fresh list from the network
+            await RefreshServersAsync(silent: _book.Servers.Count > 0);
+            try { await ipTask; } catch { }
 
             // 4. auto-connect
             if (_settings.AutoConnect && _book.Servers.Count > 0 && !_busy)
@@ -569,6 +571,7 @@ namespace EndorVPN
             CountryList.Children.Add(BuildTabHeader(ranking.Count));
             foreach (var c in ranking) CountryList.Children.Add(BuildCountryRow(c));
 
+            if (ranking.Count > 0) MarkUiReady();
             EmptyState.Visibility = ranking.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             if (ranking.Count == 0 && _book.Servers.Count > 0)
             {
@@ -727,6 +730,16 @@ namespace EndorVPN
             if (ping < 90) return 3;
             if (ping < 220) return 2;
             return 1;
+        }
+
+        private void MarkUiReady()
+        {
+            try
+            {
+                if (Directory.Exists(Program.Paths.DataDir))
+                    File.WriteAllText(Path.Combine(Program.Paths.DataDir, "ui-ready.txt"), DateTime.Now.ToString("O"));
+            }
+            catch { }
         }
 
         private void UpdateServerBadge()

@@ -24,8 +24,16 @@ public class WinApi {
 $full = (Resolve-Path $Exe).Path
 Write-Host "launching $full"
 $p = Start-Process $full -PassThru
-Start-Sleep -Seconds 22
-if ($p.HasExited) { Write-Host "EXITED code=$($p.ExitCode)" }
+$readyFile = Join-Path (Split-Path $full -Parent) "data\ui-ready.txt"
+if (Test-Path $readyFile) { Remove-Item $readyFile -Force }
+$deadline = (Get-Date).AddSeconds(75)
+while ((Get-Date) -lt $deadline) {
+  Start-Sleep -Milliseconds 700
+  if (Test-Path $readyFile) { Write-Host "ui ready marker found"; break }
+  if ($p.HasExited) { break }
+}
+Start-Sleep -Seconds 3
+if ($p.HasExited) { Write-Host "EXITED code=$($p.HasExitCode)$($p.ExitCode)" }
 $hwnd = $p.MainWindowHandle
 Write-Host "hwnd=$hwnd title=$($p.MainWindowTitle)"
 [WinApi]::ShowWindow($hwnd, 5) | Out-Null

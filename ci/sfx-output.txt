@@ -1,0 +1,36 @@
+**********************
+PowerShell transcript start
+Start time: 20261108220000
+Username: runnervmm7ud1\runneradmin
+RunAs User: runnervmm7ud1\runneradmin
+Configuration Name: 
+Machine: runnervmm7ud1 (Microsoft Windows NT 10.0.26100.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\b23125ee-8d36-4643-aced-70832ea0eb13.ps1'
+Process ID: 6740
+PSVersion: 7.6.9
+PSEdition: Core
+GitCommitId: 7.6.9
+OS: Microsoft Windows 10.0.26100
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS>TerminatingError(): "The term 'msbuild' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+>> TerminatingError(): "The term 'msbuild' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+msbuild: D:\a\_temp\b23125ee-8d36-4643-aced-70832ea0eb13.ps1:6
+Line |
+   6 |  msbuild setup\Setup.csproj /p:Configuration=Release /p:Platform=x64 / …
+     |  ~~~~~~~
+     | The term 'msbuild' is not recognized as a name of a cmdlet, function, script file, or executable program. Check
+     | the spelling of the name, or if a path was included, verify that the path is correct and try again.
+
+PS>$global:?
+False
+**********************
+PowerShell transcript end
+End time: 20261108220003
+**********************

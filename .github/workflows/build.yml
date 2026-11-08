@@ -1,0 +1,59 @@
+name: build
+
+on:
+  push:
+    branches: [arena/72bfde82-222]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  VERSION: 1.0.0
+  OPENVPN_MSI: https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.12-I001-amd64.msi
+  TAP_INSTALLER: https://build.openvpn.net/downloads/releases/tap-windows-9.24.7-I601-Win10.exe
+
+jobs:
+  win:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: fetch engine binaries
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force engine\drivers, engine\_msi | Out-Null
+          Invoke-WebRequest -Uri $env:OPENVPN_MSI -OutFile engine\_msi\openvpn.msi -UseBasicParsing
+          Start-Process msiexec.exe -Wait -ArgumentList "/a `"$PWD\engine\_msi\openvpn.msi`" /qn TARGETDIR=`"$PWD\engine\_msi\x`""
+          Copy-Item engine\_msi\x\OpenVPN\bin\openvpn.exe engine\
+          Copy-Item engine\_msi\x\OpenVPN\bin\openssl.exe engine\
+          Copy-Item engine\_msi\x\OpenVPN\bin\tapctl.exe engine\
+          Copy-Item engine\_msi\x\OpenVPN\bin\libcrypto-3-x64.dll engine\
+          Copy-Item engine\_msi\x\OpenVPN\bin\libssl-3-x64.dll engine\
+          Copy-Item engine\_msi\x\OpenVPN\bin\vcruntime140.dll engine\
+          Invoke-WebRequest -Uri $env:TAP_INSTALLER -OutFile engine\drivers\tap-windows-installer.exe -UseBasicParsing
+          Remove-Item -Recurse -Force engine\_msi
+          Get-ChildItem engine | Format-Table Name,Length
+
+      - name: build app
+        shell: pwsh
+        run: |
+          dotnet build engine\EndorVPN\EndorVPN.csproj -c Release /p:Platform=x64
+
+      - name: assemble portable folder
+        shell: pwsh
+        run: |
+          $dist = "dist\EndorVPN"
+          New-Item -ItemType Directory -Force $dist | Out-Null
+          Copy-Item engine\EndorVPN\bin\x64\Release\net48\* $dist -Recurse
+          Copy-Item engine\openvpn.exe, engine\openssl.exe, engine\tapctl.exe $dist -ErrorAction SilentlyContinue
+          Copy-Item engine\libcrypto-3-x64.dll, engine\libssl-3-x64.dll, engine\vcruntime140.dll $dist -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force $dist\drivers | Out-Null
+          Copy-Item engine\drivers\tap-windows-installer.exe $dist\drivers
+          Get-ChildItem $dist | Format-Table Name,Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EndorVPN-win64
+          path: dist/EndorVPN/**
+          if-no-files-found: error

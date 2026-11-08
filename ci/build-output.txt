@@ -1,11 +1,15 @@
   Determining projects to restore...
-  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 155 ms).
-C:\Program Files\dotnet\sdk\10.0.403\Sdks\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.NET.Sdk.WindowsDesktop.targets(111,5): error NETSDK1022: Duplicate 'Page' items were included. The .NET SDK includes 'Page' items from your project directory by default. You can either remove these items from your project file, or set the 'EnableDefaultPageItems' property to 'false' if you want to explicitly include them in your project file. For more information, see https://aka.ms/sdkimplicititems. The duplicate items were: 'App.xaml' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 116 ms).
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1127,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+CSC : error CS7064: Error opening icon file D:\a\222\222\engine\EndorVPN\app.ico -- Could not find file 'D:\a\222\222\engine\EndorVPN\app.ico'. [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 
 Build FAILED.
 
-C:\Program Files\dotnet\sdk\10.0.403\Sdks\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.NET.Sdk.WindowsDesktop.targets(111,5): error NETSDK1022: Duplicate 'Page' items were included. The .NET SDK includes 'Page' items from your project directory by default. You can either remove these items from your project file, or set the 'EnableDefaultPageItems' property to 'false' if you want to explicitly include them in your project file. For more information, see https://aka.ms/sdkimplicititems. The duplicate items were: 'App.xaml' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-    0 Warning(s)
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1127,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+CSC : error CS7064: Error opening icon file D:\a\222\222\engine\EndorVPN\app.ico -- Could not find file 'D:\a\222\222\engine\EndorVPN\app.ico'. [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+    2 Warning(s)
     1 Error(s)
 
-Time Elapsed 00:00:04.89
+Time Elapsed 00:00:06.76

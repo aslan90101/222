@@ -154,6 +154,7 @@ jobs:
           git config user.name "EndorVPN CI"
           if (Test-Path ci/build-output.txt) { git add -f ci/build-output.txt }
           if (Test-Path ci/smoke-output.txt) { git add -f ci/smoke-output.txt }
+          Get-ChildItem ci\reports\*.png -ErrorAction SilentlyContinue | ForEach-Object { git add -f $_.FullName.Replace($PWD.Path + "\", "").Replace("\", "/") }
           git commit -m "ci: build output" | Out-Null
           git pull --rebase origin arena/72bfde82-222 2>&1 | Out-Null
           git push origin HEAD:arena/72bfde82-222 2>&1 | Out-Null

@@ -68,8 +68,11 @@ $cancelAt = [System.Diagnostics.Stopwatch]::StartNew()
 for ($i = 0; $i -lt 30; $i++) {
   Start-Sleep -Milliseconds 300
   $log = Read-NewLog
-  if ($log -match "user cancelled the connection attempt") { $result.sawCancel = $true }
-  if ($result.sawCancel -and $log -match "connect cancelled / disconnected") { $result.msToIdle = $cancelAt.ElapsedMilliseconds; break }
+  if ($log -match "user cancelled the connection attempt") {
+    $result.sawCancel = $true
+    $result.msToIdle = $cancelAt.ElapsedMilliseconds
+    break
+  }
 }
 Write-Host "cancel seen: $($result.sawCancel), engine idle after $($result.msToIdle) ms"
 

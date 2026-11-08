@@ -1,0 +1,55 @@
+name: probe3
+on:
+  push:
+    branches: [arena/72bfde82-222]
+    paths: ['.github/workflows/probe3.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  p:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: net probes
+        shell: pwsh
+        run: |
+          $urls = @(
+            'https://www.vpngate.net/api/iphone/',
+            'https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.12-I001-amd64.msi',
+            'https://www.wintun.net/builds/wintun-0.14.1.zip',
+            'https://github.com/SagerNet/sing-box/releases/latest',
+            'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt',
+            'https://github.com/portapps/openvpn-portable/releases/download/2.4.9-I601-8/openvpn-portable-win64-2.4.9-I601-8.7z',
+            'https://api.ipify.org?format=json',
+            'https://ip-api.com/json/?fields=country,city,query',
+            'https://api.github.com'
+          )
+          foreach ($u in $urls) {
+            try {
+              $r = Invoke-WebRequest -Uri $u -Method Head -MaximumRedirection 5 -TimeoutSec 25 -UseBasicParsing -ErrorAction Stop
+              Write-Host "OK   $($r.StatusCode) $u"
+            } catch {
+              Write-Host "FAIL      $u  :: $($_.Exception.Message)"
+            }
+          }
+      - name: tools
+        shell: pwsh
+        run: |
+          Write-Host "7z: $((Get-Command 7z -ErrorAction SilentlyContinue).Source)"
+          if (Test-Path 'C:\Program Files\7-Zip\7z.exe') { Write-Host "7z exe exists"; & 'C:\Program Files\7-Zip\7z.exe' | Select-Object -First 3 }
+          Get-PSDrive C | Format-List Used,Free
+          node -v; npm -v
+      - name: download portable openvpn + list
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri 'https://github.com/portapps/openvpn-portable/releases/download/2.4.9-I601-8/openvpn-portable-win64-2.4.9-I601-8.7z' -OutFile ovpn.7z -UseBasicParsing
+          & 'C:\Program Files\7-Zip\7z.exe' l ovpn.7z | Select-Object -Last 60
+      - name: release test
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "probe" > probe.txt
+          gh release create "probe-$(Get-Date -Format yyyyMMddHHmmss)" probe.txt --title "probe" --notes "probe" --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -eq 0) { Write-Host "RELEASE_OK" } else { Write-Host "RELEASE_FAIL" }

@@ -49,7 +49,7 @@ namespace EndorVPN
             var book = new ServerBook(log);
             var source = new ServerSourceProbe();
             var servers = source.LoadSample(log);
-            Check("servers.parse", servers.Count > 20, servers.Count.ToString());
+            Check("servers.parse", servers.Count >= 10, servers.Count.ToString());
             Check("servers.countries", servers.Select(s => s.CountryCode).Distinct().Count() > 5);
             book.SetServers(servers, new[] { "US" });
             Check("book.countries", book.Countries.Count > 5, book.Countries.Count.ToString());

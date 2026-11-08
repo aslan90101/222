@@ -51,12 +51,15 @@ jobs:
         run: |
           $dist = "dist\EndorVPN"
           New-Item -ItemType Directory -Force $dist | Out-Null
-          Copy-Item engine\EndorVPN\bin\x64\Release\net48\* $dist -Recurse
-          Copy-Item engine\openvpn.exe, engine\openssl.exe, engine\tapctl.exe $dist -ErrorAction SilentlyContinue
-          Copy-Item engine\libcrypto-3-x64.dll, engine\libssl-3-x64.dll, engine\vcruntime140.dll $dist -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force $dist\drivers | Out-Null
-          Copy-Item engine\drivers\tap-windows-installer.exe $dist\drivers
-          Get-ChildItem $dist | Format-Table Name,Length
+          Copy-Item engine\EndorVPN\bin\x64\Release\net48\EndorVPN.exe $dist
+          $eng = Join-Path $dist "engine"
+          New-Item -ItemType Directory -Force $eng, (Join-Path $eng "drivers") | Out-Null
+          Copy-Item engine\openvpn.exe, engine\openssl.exe, engine\tapctl.exe $eng -ErrorAction SilentlyContinue
+          Copy-Item engine\libcrypto-3-x64.dll, engine\libssl-3-x64.dll, engine\vcruntime140.dll $eng -ErrorAction SilentlyContinue
+          Copy-Item engine\drivers\tap-windows-installer.exe (Join-Path $eng "drivers")
+          Copy-Item LICENSE, THIRD_PARTY_NOTICES.md $dist -ErrorAction SilentlyContinue
+          Write-Host "--- portable layout ---"
+          Get-ChildItem $dist -Recurse -File | ForEach-Object { Write-Host ($_.FullName.Replace($PWD.Path + "\", "") + "  " + [math]::Round($_.Length/1KB,1) + " KB") }
 
       - name: smoke test
         shell: pwsh

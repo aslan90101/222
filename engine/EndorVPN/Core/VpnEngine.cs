@@ -105,13 +105,13 @@ namespace EndorVPN.Core
                     }
                 }
 
-                int attempt = 0;
+                int attemptNo = 0;
                 foreach (var candidate in candidates)
                 {
                     if (_cts.IsCancellationRequested) break;
-                    if (attempt++ >= MaxAttempts) break;
+                    if (attemptNo++ >= MaxAttempts) break;
                     Stage(Loc.T("stage.tunnel") + " · " + candidate.Host);
-                    _log.Info("attempt " + attempt + ": " + candidate.Host + " (" + candidate.CountryCode + ")");
+                    _log.Info("attempt " + attemptNo + ": " + candidate.Host + " (" + candidate.CountryCode + ")");
                     var attempt = await TryServerAsync(candidate, settings, _cts.Token).ConfigureAwait(false);
                     if (attempt.Ok)
                     {

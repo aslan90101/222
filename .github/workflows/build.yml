@@ -38,7 +38,9 @@ jobs:
       - name: build app
         shell: pwsh
         run: |
-          dotnet build engine\EndorVPN\EndorVPN.csproj -c Release /p:Platform=x64
+          New-Item -ItemType Directory -Force ci | Out-Null
+          dotnet build engine\EndorVPN\EndorVPN.csproj -c Release /p:Platform=x64 *>&1 | Tee-Object -FilePath ci/build-output.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: assemble portable folder
         shell: pwsh
@@ -57,3 +59,16 @@ jobs:
           name: EndorVPN-win64
           path: dist/EndorVPN/**
           if-no-files-found: error
+
+      - name: publish build log to repo
+        if: always()
+        shell: pwsh
+        run: |
+          git config user.email "ci@endorvpn.local"
+          git config user.name "EndorVPN CI"
+          if (Test-Path ci/build-output.txt) {
+            git add -f ci/build-output.txt
+            git commit -m "ci: build output" | Out-Null
+          }
+          git pull --rebase origin arena/72bfde82-222 2>&1 | Out-Null
+          git push origin HEAD:arena/72bfde82-222 2>&1 | Out-Null

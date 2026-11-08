@@ -2,26 +2,38 @@ name: probe4
 on:
   push:
     branches: [arena/72bfde82-222]
-    paths: ['ci/probe8.ps1', '.github/workflows/probe4.yml']
+    paths: ['ci/probe9.ps1', 'ci/probe-wpf.ps1', 'ci/wpfprobe/**', '.github/workflows/probe4.yml']
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  p:
+  vpnbook:
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: run probe
         shell: pwsh
-        run: ./ci/probe8.ps1
+        run: ./ci/probe9.ps1
         continue-on-error: true
       - name: push report
         shell: pwsh
         run: |
-          git config user.email "ci@endorvpn.local"
-          git config user.name "EndorVPN CI"
-          git add -A ci/reports
-          git commit -m "ci: probe8 report" | Out-Null
-          git pull --rebase origin arena/72bfde82-222
-          git push origin HEAD:arena/72bfde82-222
+          git config user.email "ci@endorvpn.local"; git config user.name "EndorVPN CI"
+          git add -A ci/reports; git commit -m "ci: probe9 report" | Out-Null
+          git pull --rebase origin arena/72bfde82-222; git push origin HEAD:arena/72bfde82-222
+  wpf:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: run wpf probe
+        shell: pwsh
+        run: ./ci/probe-wpf.ps1
+        continue-on-error: true
+      - name: push report
+        shell: pwsh
+        run: |
+          git config user.email "ci@endorvpn.local"; git config user.name "EndorVPN CI"
+          git add -A ci/reports; git commit -m "ci: wpf probe report" | Out-Null
+          git pull --rebase origin arena/72bfde82-222; git push origin HEAD:arena/72bfde82-222

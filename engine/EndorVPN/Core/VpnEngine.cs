@@ -171,7 +171,7 @@ namespace EndorVPN.Core
             var opts = new ConfigBuilder.Options
             {
                 AdapterName = TapManager.AdapterName,
-                AuthFile = authFile,
+                AuthFile = authFile == null ? null : authFile.Replace('\\', '/'),
                 Transport = settings.Transport == "tcp" ? ConfigBuilder.Transport.Tcp
                           : settings.Transport == "udp" ? ConfigBuilder.Transport.Udp
                           : ConfigBuilder.Transport.Auto,

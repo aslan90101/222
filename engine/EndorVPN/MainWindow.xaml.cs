@@ -547,8 +547,22 @@ namespace EndorVPN
                 var result = await _engine.ConnectAsync(server, _settings, alternatives, _opCts.Token);
                 if (!result.Ok)
                 {
-                    SetState(VpnEngine.State.Idle);
-                    Toast(Loc.T("err.unknown") + ": " + Loc.T(result.ErrorKey), ToastKind.Err);
+                    // Free VPN Gate nodes reject anonymous logins from many IPs.
+                    // Before giving up, try the stable VPNBook pool in the same
+                    // country (or the nearest one that exists).
+                    var fallback = _book.FallbackFor(server, country);
+                    if (fallback != null)
+                    {
+                        Program.Log.Info("fallback to " + fallback.Provider + " " + fallback.Host);
+                        StageText(Loc.T("stage.tunnel") + " · " + fallback.Host);
+                        SetState(VpnEngine.State.Connecting);
+                        result = await _engine.ConnectAsync(fallback, _settings, new List<VpnServer> { fallback }, _opCts.Token);
+                    }
+                    if (!result.Ok)
+                    {
+                        SetState(VpnEngine.State.Idle);
+                        Toast(Loc.T("err.unknown") + ": " + Loc.T(result.ErrorKey), ToastKind.Err);
+                    }
                 }
             }
             finally

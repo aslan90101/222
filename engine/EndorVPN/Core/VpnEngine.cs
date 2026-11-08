@@ -66,10 +66,13 @@ namespace EndorVPN.Core
         public TapManager Tap { get { return _tap; } }
 
         /// <summary>How long a single server gets to come up before we move on.</summary>
-        public int AttemptTimeoutSec = 30;
+        public int AttemptTimeoutSec = 18;
 
         /// <summary>Hard cap on attempts in one ConnectAsync call.</summary>
-        public int MaxAttempts = 4;
+        public int MaxAttempts = 5;
+
+        /// <summary>Set by the log pump when the peer rejects our credentials.</summary>
+        private volatile bool _authRejected;
 
         public async Task<ConnectResult> ConnectAsync(VpnServer server, AppSettings settings, IList<VpnServer> alternatives, CancellationToken ct)
         {
@@ -225,6 +228,7 @@ namespace EndorVPN.Core
             }
 
             _tunnelUp = false;
+            _authRejected = false;
             var sw = Stopwatch.StartNew();
             long readOffset = 0;
             bool timedOut = false;
@@ -234,6 +238,16 @@ namespace EndorVPN.Core
             {
                 if (ct.IsCancellationRequested) break;
                 await Task.Delay(220, ct).ConfigureAwait(false);
+
+                if (_authRejected)
+                {
+                    _log.Warn("auth rejected by " + server.Host + " - moving on");
+                    _lastLogLine = "AUTH_FAILED";
+                    StopProcess();
+                    res.ErrorKey = "err.auth";
+                    res.Detail = "AUTH_FAILED";
+                    return res;
+                }
 
                 if (_proc.HasExited)
                 {
@@ -310,7 +324,11 @@ namespace EndorVPN.Core
                             if (line.IndexOf("AUTH_FAILED", StringComparison.OrdinalIgnoreCase) >= 0 ||
                                 line.IndexOf("TLS Error", StringComparison.OrdinalIgnoreCase) >= 0 ||
                                 line.IndexOf("FATAL", StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
                                 _lastLogLine = line.Trim();
+                                if (line.IndexOf("AUTH_FAILED", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    _authRejected = true;
+                            }
                             var h = LogLine;
                             if (h != null && line.Length > 0) h("  " + line.Trim());
                         }

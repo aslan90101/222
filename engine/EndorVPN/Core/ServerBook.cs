@@ -149,6 +149,38 @@ namespace EndorVPN.Core
                 .FirstOrDefault();
         }
 
+        /// <summary>
+        /// Best server from a different provider than the one that just failed,
+        /// preferring the same country and then a geographically close one.
+        /// VPN Gate rejects anonymous logins from many networks; VPNBook keeps a
+        /// small, stable pool that is our reliable fallback.
+        /// </summary>
+        public VpnServer FallbackFor(VpnServer failed, string countryCode)
+        {
+            if (failed == null) return null;
+            var pool = Servers.Where(s => s.Provider != failed.Provider && !string.IsNullOrEmpty(s.Host)).ToList();
+            if (pool.Count == 0) return null;
+
+            var same = pool.Where(s => string.Equals(s.CountryCode, failed.CountryCode, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (same.Count > 0) return Best(same);
+
+            var wanted = string.Equals(countryCode, failed.CountryCode, StringComparison.OrdinalIgnoreCase) ? countryCode : null;
+            if (wanted != null)
+            {
+                var byCountry = pool.Where(s => string.Equals(s.CountryCode, wanted, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (byCountry.Count > 0) return Best(byCountry);
+            }
+            return Best(pool);
+        }
+
+        private static VpnServer Best(List<VpnServer> list)
+        {
+            return list
+                .OrderBy(s => s._measuredPing > 0 ? s._measuredPing : (s.Ping > 0 ? s.Ping : 9000))
+                .ThenByDescending(s => s.SpeedBps)
+                .FirstOrDefault();
+        }
+
         /// <summary>Ranked list of countries for the picker, honouring favorites.</summary>
         public List<Country> Ranking(string filter, string query, out List<Country> favoritesList)
         {

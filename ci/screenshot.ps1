@@ -100,7 +100,7 @@ Shot "shot-2-main-en.png"
 Invoke-ById "BtnSettings" | Out-Null
 Start-Sleep -Milliseconds 1200
 Shot "shot-3-settings.png"
-Invoke-ById "BtnSettings" | Out-Null
+Invoke-ById "BtnCloseSettings" | Out-Null
 Start-Sleep -Milliseconds 900
 
 # pick the first country row by clicking its centre

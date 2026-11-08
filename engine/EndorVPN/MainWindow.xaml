@@ -364,7 +364,7 @@
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0" Margin="0,0,0,10">
                             <TextBlock x:Name="SettingsTitle" FontSize="15" FontWeight="SemiBold" Foreground="#EAF0FF" Text="Настройки"/>
-                            <Button HorizontalAlignment="Right" Style="{DynamicResource IconButton}" Click="BtnCloseSettings_Click">
+                            <Button x:Name="BtnCloseSettings" HorizontalAlignment="Right" Style="{DynamicResource IconButton}" Click="BtnCloseSettings_Click">
                                 <Path Data="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6 10.6 12 5 6.4 6.4 5Z"
                                       Fill="#93A0BD" Width="14" Height="14" Stretch="Uniform"/>
                             </Button>

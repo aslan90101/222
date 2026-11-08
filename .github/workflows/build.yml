@@ -25,12 +25,8 @@ jobs:
           New-Item -ItemType Directory -Force engine\drivers, engine\_msi | Out-Null
           Invoke-WebRequest -Uri $env:OPENVPN_MSI -OutFile engine\_msi\openvpn.msi -UseBasicParsing
           Start-Process msiexec.exe -Wait -ArgumentList "/a `"$PWD\engine\_msi\openvpn.msi`" /qn TARGETDIR=`"$PWD\engine\_msi\x`""
-          Copy-Item engine\_msi\x\OpenVPN\bin\openvpn.exe engine\
-          Copy-Item engine\_msi\x\OpenVPN\bin\openssl.exe engine\
-          Copy-Item engine\_msi\x\OpenVPN\bin\tapctl.exe engine\
-          Copy-Item engine\_msi\x\OpenVPN\bin\libcrypto-3-x64.dll engine\
-          Copy-Item engine\_msi\x\OpenVPN\bin\libssl-3-x64.dll engine\
-          Copy-Item engine\_msi\x\OpenVPN\bin\vcruntime140.dll engine\
+          Copy-Item engine\_msi\x\OpenVPN\bin\* engine\ -Include *.exe,*.dll
+
           Invoke-WebRequest -Uri $env:TAP_INSTALLER -OutFile engine\drivers\tap-windows-installer.exe -UseBasicParsing
           Remove-Item -Recurse -Force engine\_msi
           Get-ChildItem engine | Format-Table Name,Length
@@ -54,12 +50,25 @@ jobs:
           Copy-Item engine\EndorVPN\bin\x64\Release\net48\EndorVPN.exe $dist
           $eng = Join-Path $dist "engine"
           New-Item -ItemType Directory -Force $eng, (Join-Path $eng "drivers") | Out-Null
-          Copy-Item engine\openvpn.exe, engine\openssl.exe, engine\tapctl.exe $eng -ErrorAction SilentlyContinue
-          Copy-Item engine\libcrypto-3-x64.dll, engine\libssl-3-x64.dll, engine\vcruntime140.dll $eng -ErrorAction SilentlyContinue
+          Copy-Item engine\*.exe, engine\*.dll $eng -ErrorAction SilentlyContinue
           Copy-Item engine\drivers\tap-windows-installer.exe (Join-Path $eng "drivers")
           Copy-Item LICENSE, THIRD_PARTY_NOTICES.md $dist -ErrorAction SilentlyContinue
           Write-Host "--- portable layout ---"
           Get-ChildItem $dist -Recurse -File | ForEach-Object { Write-Host ($_.FullName.Replace($PWD.Path + "\", "") + "  " + [math]::Round($_.Length/1KB,1) + " KB") }
+
+      - name: verify engine bundle
+        shell: pwsh
+        run: |
+          $eng = "dist\EndorVPN\engine"
+          $required = @("openvpn.exe","tapctl.exe","libpkcs11-helper-1.dll","libcrypto-3-x64.dll","libssl-3-x64.dll","liblzo2-2.dll","vcruntime140.dll","drivers\tap-windows-installer.exe")
+          $missing = @()
+          foreach ($r in $required) { if (-not (Test-Path (Join-Path $eng $r))) { $missing += $r } }
+          Write-Host "engine files:"; Get-ChildItem $eng -Recurse -File | ForEach-Object { Write-Host ("  " + $_.Name) }
+          if ($missing.Count -gt 0) { throw ("missing engine files: " + ($missing -join ", ")) }
+          # openvpn must at least start and print its version (DLL resolution check)
+          $out = & (Join-Path $eng "openvpn.exe") --version 2>&1
+          Write-Host ($out -join " | ")
+          if (-not ($out -match "OpenVPN 2")) { throw "openvpn.exe failed to start - missing dependencies" }
 
       - name: smoke test
         shell: pwsh
@@ -159,7 +168,7 @@ jobs:
           git config user.name "EndorVPN CI"
           if (Test-Path ci/build-output.txt) { git add -f ci/build-output.txt }
           if (Test-Path ci/smoke-output.txt) { git add -f ci/smoke-output.txt }
-          Get-ChildItem ci\reports\*.png -ErrorAction SilentlyContinue | ForEach-Object { git add -f $_.FullName.Replace($PWD.Path + "\", "").Replace("\", "/") }
+          Get-ChildItem ci\reports\*.* -ErrorAction SilentlyContinue | ForEach-Object { git add -f $_.FullName.Replace($PWD.Path + "\", "").Replace("\", "/") }
           git commit -m "ci: build output" | Out-Null
           git pull --rebase origin arena/72bfde82-222 2>&1 | Out-Null
           git push origin HEAD:arena/72bfde82-222 2>&1 | Out-Null

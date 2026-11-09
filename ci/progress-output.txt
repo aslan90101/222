@@ -1,11 +1,12 @@
-distinct hint texts: 10
+distinct hint texts: 11
   Preparing network adapter… · click to cancel
-  Checking which servers answer… · 2/4 · click to cancel
+  Checking which servers answer… · 0/6 · click to cancel
+  Checking which servers answer… · 1/6 · click to cancel
+  Checking which servers answer… · 2/6 · click to cancel
   Establishing tunnel… · vpn386448989 · 11s · click to cancel
   Establishing tunnel… · vpn386448989 · 10s · click to cancel
   Establishing tunnel… · vpn386448989 · 9s · click to cancel
   Establishing tunnel… · vpn386448989 · 8s · click to cancel
-  Establishing tunnel… · vpn386448989 · 7s · click to cancel
   Configuring routes… · click to cancel
   Verifying new IP… · click to cancel
   Click to disconnect

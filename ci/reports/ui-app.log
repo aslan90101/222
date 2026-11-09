@@ -1,257 +1,210 @@
-﻿2026-11-09 12:46:05.072 [INFO] === EndorVPN 1.2.0 starting (admin=True) ===
-2026-11-09 12:46:05.311 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
-2026-11-09 12:46:05.315 [INFO] parsed 18 servers
-2026-11-09 12:46:05.404 [INFO] server book: 18 servers in 9 countries
-2026-11-09 12:46:05.453 [INFO] server cache saved, 23 chars
-2026-11-09 12:46:05.457 [INFO] smoke exit 0
-2026-11-09 12:46:06.622 [INFO] === EndorVPN 1.2.0 starting (admin=True) ===
-2026-11-09 12:46:06.772 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:46:06.772 [INFO] e2e ip before: 52.161.51.48
-2026-11-09 12:46:07.235 [INFO] vpnbook credentials parsed
-2026-11-09 12:46:07.255 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
-2026-11-09 12:46:08.006 [INFO] vpnbook servers: 20
-2026-11-09 12:46:08.655 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 641 ms, 1333682 chars
-2026-11-09 12:46:08.663 [INFO] parsed 99 servers
-2026-11-09 12:46:09.397 [INFO] server list from http://www.vpngate.net/api/iphone/ in 1384 ms, 1347184 chars
-2026-11-09 12:46:09.403 [INFO] parsed 100 servers
-2026-11-09 12:46:09.537 [INFO] server list from https://www.vpngate.net/api/iphone/ in 1523 ms, 1347184 chars
-2026-11-09 12:46:09.545 [INFO] parsed 100 servers
-2026-11-09 12:46:09.551 [INFO] merged server list: 196 servers from 3 sources
-2026-11-09 12:46:09.555 [INFO] e2e candidates: 26
-2026-11-09 12:46:09.555 [INFO] e2e trying us16.vpnbook.com (US, vpnbook)
-2026-11-09 12:46:09.589 [INFO] running TAP installer
-2026-11-09 12:46:14.769 [INFO] adapter enable: exit 1 This network connection does not exist.
-2026-11-09 12:46:16.242 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 612 ms
-2026-11-09 12:46:16.264 [INFO] rank: us16.vpnbook.com 612 ms via udp/25000
-2026-11-09 12:46:16.264 [INFO] preflight: 1/1 candidates answered
-2026-11-09 12:46:16.266 [INFO] attempt 1/1: us16.vpnbook.com (US)
-2026-11-09 12:46:16.268 [INFO] transport for us16.vpnbook.com: udp/25000
-2026-11-09 12:46:16.278 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-09 12:46:16.278 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-09 12:46:16.278 [INFO] config preview: # EndorVPN profile for us16.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 1 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us16.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / <ca> / -----BEGIN CERTIFICATE----- / MIIDSzCCAjOgAwIBAgIUJdJ
-2026-11-09 12:46:23.442 [WARN] ip provider failed http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query: An error occurred while sending the request.
-2026-11-09 12:46:35.459 [WARN] ip provider failed https://api.ipify.org?format=json: A task was canceled.
-2026-11-09 12:46:35.459 [INFO] tunnel up via us16.vpnbook.com, exit ip ?
-2026-11-09 12:46:35.459 [INFO] e2e result: {"stage":"start","ipBefore":"52.161.51.48","ipAfter":"","server":"us16.vpnbook.com","country":"US","provider":"vpnbook","connected":true,"ipChanged":false,"done":true}
-2026-11-09 12:46:38.494 [INFO] connect cancelled / disconnected
-2026-11-09 12:46:38.560 [INFO] e2e exit 3
-2026-11-09 12:46:43.223 [INFO] === EndorVPN 1.2.0 starting (admin=True) ===
-2026-11-09 12:46:45.245 [INFO] render: begin
-2026-11-09 12:46:45.471 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:46:45.506 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 150 ms, 1333682 chars
-2026-11-09 12:46:45.520 [INFO] parsed 99 servers
-2026-11-09 12:46:45.786 [INFO] vpnbook credentials parsed
-2026-11-09 12:46:45.814 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
-2026-11-09 12:46:46.491 [INFO] vpnbook servers: 20
-2026-11-09 12:46:47.193 [INFO] server list from http://www.vpngate.net/api/iphone/ in 1837 ms, 1333631 chars
-2026-11-09 12:46:47.213 [INFO] parsed 99 servers
-2026-11-09 12:46:54.448 [INFO] server list from https://www.vpngate.net/api/iphone/ in 9093 ms, 1333631 chars
-2026-11-09 12:46:54.458 [INFO] parsed 99 servers
-2026-11-09 12:46:54.464 [INFO] merged server list: 196 servers from 3 sources
-2026-11-09 12:46:54.464 [INFO] merged providers: 206 servers
-2026-11-09 12:46:54.468 [INFO] server book: 206 servers in 20 countries
-2026-11-09 12:46:54.474 [INFO] default country: US
-2026-11-09 12:46:54.502 [INFO] server cache saved, 2710292 chars
-2026-11-09 12:46:54.502 [INFO] render: begin
-2026-11-09 12:46:54.506 [INFO] render: ranking 20
-2026-11-09 12:46:54.547 [INFO] render: rows 5/20
-2026-11-09 12:46:54.549 [INFO] render: rows 10/20
-2026-11-09 12:46:54.552 [INFO] render: rows 15/20
-2026-11-09 12:46:54.554 [INFO] render: rows 20/20
-2026-11-09 12:46:54.554 [INFO] render: rows built 21
-2026-11-09 12:46:54.554 [INFO] render: servers=206 ranking=20 filter=all search=''
-2026-11-09 12:46:57.572 [INFO] connecting to US with 9 ranked candidates
-2026-11-09 12:47:05.485 [INFO] TAP adapter already present
-2026-11-09 12:47:05.860 [INFO] adapter enable: exit 1 This network connection does not exist.
-2026-11-09 12:47:07.465 [INFO] probe: us178.vpnbook.com [us178.vpnbook.com] 34 ms
-2026-11-09 12:47:07.465 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 43 ms
-2026-11-09 12:47:07.465 [INFO] probe: vpn349305622 [38.73.242.33] no reply
-2026-11-09 12:47:07.465 [INFO] probe: vpn835304687 [169.231.240.152] no reply
-2026-11-09 12:47:07.465 [INFO] probe: vpn100383739 [128.211.249.131] 28 ms
-2026-11-09 12:47:07.474 [INFO] probe: vpn745412775 [47.159.161.160] 31 ms
-2026-11-09 12:47:07.475 [INFO] probe: vpn551628501 [76.167.43.6] 246 ms
-2026-11-09 12:47:07.475 [INFO] probe: vpn563780796 [71.208.73.227] 1058 ms
-2026-11-09 12:47:07.475 [INFO] probe: vpn680288952 [47.25.225.222] no reply
-2026-11-09 12:47:07.491 [INFO] rank: vpn100383739 28 ms via udp/1195
-2026-11-09 12:47:07.491 [INFO] rank: us178.vpnbook.com 34 ms via udp/25000
-2026-11-09 12:47:07.491 [INFO] rank: us16.vpnbook.com 43 ms via udp/25000
-2026-11-09 12:47:07.492 [INFO] rank: vpn551628501 246 ms via tcp/1318
-2026-11-09 12:47:07.492 [INFO] preflight: 6/9 candidates answered
-2026-11-09 12:47:07.494 [INFO] preflight: skipped 3 dead nodes
-2026-11-09 12:47:07.494 [INFO] attempt 1/5: vpn100383739 (US)
-2026-11-09 12:47:07.500 [INFO] transport for vpn100383739: udp/1195
-2026-11-09 12:47:07.537 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-09 12:47:07.537 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-09 12:47:07.537 [INFO] config preview: # EndorVPN profile for vpn100383739 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 1 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote 128.211.249.131 1195 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw / TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVyb
-2026-11-09 12:47:09.662 [WARN] openvpn exited with 0
-2026-11-09 12:47:09.670 [WARN] server failed: vpn100383739 -> 2026-11-09 12:47:09 AUTH: Received control message: AUTH_FAILED
-2026-11-09 12:47:09.671 [INFO] attempt 2/5: us178.vpnbook.com (US)
-2026-11-09 12:47:09.671 [INFO] transport for us178.vpnbook.com: udp/25000
-2026-11-09 12:47:09.672 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-09 12:47:09.672 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-09 12:47:09.672 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 1 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us178.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / block-outside-dns / <ca> / -----BEGIN CERTIFICATE----- / MI
-2026-11-09 12:47:10.076 [INFO] latency measured for 38 servers
-2026-11-09 12:47:10.076 [INFO] render: begin
-2026-11-09 12:47:10.080 [INFO] render: ranking 20
-2026-11-09 12:47:10.082 [INFO] render: rows 5/20
-2026-11-09 12:47:10.083 [INFO] render: rows 10/20
-2026-11-09 12:47:10.085 [INFO] render: rows 15/20
-2026-11-09 12:47:10.086 [INFO] render: rows 20/20
-2026-11-09 12:47:10.086 [INFO] render: rows built 21
-2026-11-09 12:47:10.086 [INFO] render: servers=206 ranking=20 filter=all search=''
-2026-11-09 12:47:10.086 [INFO] latency probe finished
-2026-11-09 12:47:20.241 [WARN] ip provider failed http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query: A task was canceled.
-2026-11-09 12:47:22.356 [INFO] ip 147.135.37.178 via https://api.ipify.org?format=json
-2026-11-09 12:47:22.356 [INFO] tunnel up via us178.vpnbook.com, exit ip 147.135.37.178
-2026-11-09 12:47:22.491 [INFO] ip 147.135.37.178 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:47:28.412 [INFO] === EndorVPN 1.2.0 starting (admin=True) ===
-2026-11-09 12:47:28.678 [INFO] render: begin
-2026-11-09 12:47:28.849 [INFO] server book: 206 servers in 20 countries
-2026-11-09 12:47:28.849 [INFO] render: begin
-2026-11-09 12:47:28.853 [INFO] render: ranking 20
-2026-11-09 12:47:28.871 [INFO] render: rows 5/20
-2026-11-09 12:47:28.873 [INFO] render: rows 10/20
-2026-11-09 12:47:28.875 [INFO] render: rows 15/20
-2026-11-09 12:47:28.877 [INFO] render: rows 20/20
-2026-11-09 12:47:28.877 [INFO] render: rows built 21
-2026-11-09 12:47:28.877 [INFO] render: servers=206 ranking=20 filter=all search=''
-2026-11-09 12:47:29.061 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 164 ms, 1333682 chars
-2026-11-09 12:47:29.088 [INFO] parsed 99 servers
-2026-11-09 12:47:29.116 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:47:29.415 [INFO] vpnbook credentials parsed
-2026-11-09 12:47:29.433 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
-2026-11-09 12:47:30.215 [INFO] vpnbook servers: 20
-2026-11-09 12:47:31.024 [INFO] server list from http://www.vpngate.net/api/iphone/ in 2115 ms, 1347192 chars
-2026-11-09 12:47:31.030 [INFO] parsed 100 servers
-2026-11-09 12:47:37.680 [INFO] server list from https://www.vpngate.net/api/iphone/ in 8782 ms, 1347192 chars
-2026-11-09 12:47:37.689 [INFO] parsed 100 servers
-2026-11-09 12:47:37.697 [INFO] merged server list: 196 servers from 3 sources
-2026-11-09 12:47:37.697 [INFO] merged providers: 206 servers
-2026-11-09 12:47:37.697 [INFO] server book: 206 servers in 19 countries
-2026-11-09 12:47:37.717 [INFO] server cache saved, 2710321 chars
-2026-11-09 12:47:37.717 [INFO] render: begin
-2026-11-09 12:47:37.719 [INFO] render: ranking 19
-2026-11-09 12:47:37.721 [INFO] render: rows 5/19
-2026-11-09 12:47:37.722 [INFO] render: rows 10/19
-2026-11-09 12:47:37.724 [INFO] render: rows 15/19
-2026-11-09 12:47:37.724 [INFO] render: rows built 20
-2026-11-09 12:47:37.724 [INFO] render: servers=206 ranking=19 filter=all search=''
-2026-11-09 12:47:48.698 [INFO] latency measured for 37 servers
-2026-11-09 12:47:48.698 [INFO] render: begin
-2026-11-09 12:47:48.700 [INFO] render: ranking 19
-2026-11-09 12:47:48.702 [INFO] render: rows 5/19
-2026-11-09 12:47:48.702 [INFO] render: rows 10/19
-2026-11-09 12:47:48.704 [INFO] render: rows 15/19
-2026-11-09 12:47:48.704 [INFO] render: rows built 20
-2026-11-09 12:47:48.704 [INFO] render: servers=206 ranking=19 filter=all search=''
-2026-11-09 12:47:48.704 [INFO] latency probe finished
-2026-11-09 12:47:51.735 [INFO] connecting to US with 9 ranked candidates
-2026-11-09 12:47:51.787 [INFO] TAP adapter already present
-2026-11-09 12:47:52.116 [INFO] adapter enable: exit 1 This network connection does not exist.
-2026-11-09 12:47:54.627 [INFO] probe: us178.vpnbook.com [us178.vpnbook.com] 33 ms
-2026-11-09 12:47:54.628 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 50 ms
-2026-11-09 12:47:54.628 [INFO] probe: vpn349305622 [38.73.242.33] no reply
-2026-11-09 12:47:54.628 [INFO] probe: vpn835304687 [169.231.240.152] no reply
-2026-11-09 12:47:54.628 [INFO] probe: vpn100383739 [128.211.249.131] 30 ms
-2026-11-09 12:47:54.628 [INFO] probe: vpn745412775 [47.159.161.160] 37 ms
-2026-11-09 12:47:54.628 [INFO] probe: vpn551628501 [76.167.43.6] 44 ms
-2026-11-09 12:47:54.628 [INFO] probe: vpn563780796 [71.208.73.227] 57 ms
-2026-11-09 12:47:54.628 [INFO] probe: vpn680288952 [47.25.225.222] no reply
-2026-11-09 12:47:54.663 [INFO] rank: vpn100383739 30 ms via udp/1195
-2026-11-09 12:47:54.664 [INFO] rank: us178.vpnbook.com 33 ms via udp/25000
-2026-11-09 12:47:54.664 [INFO] rank: vpn551628501 44 ms via tcp/1318
-2026-11-09 12:47:54.664 [INFO] rank: vpn563780796 57 ms via tcp/1921
-2026-11-09 12:47:54.664 [INFO] preflight: 6/9 candidates answered
-2026-11-09 12:47:54.667 [INFO] preflight: skipped 3 dead nodes
-2026-11-09 12:47:54.667 [INFO] attempt 1/5: vpn100383739 (US)
-2026-11-09 12:47:54.669 [INFO] transport for vpn100383739: udp/1195
-2026-11-09 12:47:54.703 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-09 12:47:54.703 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-09 12:47:54.703 [INFO] config preview: # EndorVPN profile for vpn100383739 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 1 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote 128.211.249.131 1195 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw / TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVyb
-2026-11-09 12:47:56.149 [WARN] openvpn exited with 0
-2026-11-09 12:47:56.151 [WARN] server failed: vpn100383739 -> 2026-11-09 12:47:55 AUTH: Received control message: AUTH_FAILED
-2026-11-09 12:47:56.151 [INFO] attempt 2/5: us178.vpnbook.com (US)
-2026-11-09 12:47:56.151 [INFO] transport for us178.vpnbook.com: udp/25000
-2026-11-09 12:47:56.152 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-09 12:47:56.152 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-09 12:47:56.152 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 1 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us178.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / block-outside-dns / <ca> / -----BEGIN CERTIFICATE----- / MI
-2026-11-09 12:48:01.274 [INFO] user cancelled the connection attempt
-2026-11-09 12:48:01.294 [INFO] connect cancelled / disconnected
-2026-11-09 12:48:02.810 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:48:02.810 [INFO] tunnel up via us178.vpnbook.com, exit ip 52.161.51.48
-2026-11-09 12:48:15.446 [INFO] === EndorVPN 1.2.0 starting (admin=True) ===
-2026-11-09 12:48:15.704 [INFO] render: begin
-2026-11-09 12:48:15.879 [INFO] server book: 206 servers in 19 countries
-2026-11-09 12:48:15.881 [INFO] render: begin
-2026-11-09 12:48:15.885 [INFO] render: ranking 19
-2026-11-09 12:48:15.903 [INFO] render: rows 5/19
-2026-11-09 12:48:15.903 [INFO] render: rows 10/19
-2026-11-09 12:48:15.905 [INFO] render: rows 15/19
-2026-11-09 12:48:15.907 [INFO] render: rows built 20
-2026-11-09 12:48:15.907 [INFO] render: servers=206 ranking=19 filter=all search=''
-2026-11-09 12:48:16.022 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:48:16.085 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 150 ms, 1333682 chars
-2026-11-09 12:48:16.120 [INFO] parsed 99 servers
-2026-11-09 12:48:16.321 [INFO] vpnbook credentials parsed
-2026-11-09 12:48:16.339 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
-2026-11-09 12:48:16.950 [INFO] vpnbook servers: 20
-2026-11-09 12:48:17.776 [INFO] server list from https://www.vpngate.net/api/iphone/ in 1846 ms, 1347192 chars
-2026-11-09 12:48:17.783 [INFO] parsed 100 servers
-2026-11-09 12:48:20.591 [INFO] server list from http://www.vpngate.net/api/iphone/ in 4657 ms, 1347192 chars
-2026-11-09 12:48:20.601 [INFO] parsed 100 servers
-2026-11-09 12:48:20.611 [INFO] merged server list: 196 servers from 3 sources
-2026-11-09 12:48:20.611 [INFO] merged providers: 206 servers
-2026-11-09 12:48:20.611 [INFO] server book: 206 servers in 19 countries
-2026-11-09 12:48:20.631 [INFO] server cache saved, 2710329 chars
-2026-11-09 12:48:20.631 [INFO] render: begin
-2026-11-09 12:48:20.633 [INFO] render: ranking 19
-2026-11-09 12:48:20.633 [INFO] render: rows 5/19
-2026-11-09 12:48:20.635 [INFO] render: rows 10/19
-2026-11-09 12:48:20.635 [INFO] render: rows 15/19
-2026-11-09 12:48:20.637 [INFO] render: rows built 20
-2026-11-09 12:48:20.637 [INFO] render: servers=206 ranking=19 filter=all search=''
-2026-11-09 12:48:24.950 [INFO] connecting to US with 9 ranked candidates
-2026-11-09 12:48:31.560 [INFO] TAP adapter already present
-2026-11-09 12:48:31.950 [INFO] adapter enable: exit 1 This network connection does not exist.
-2026-11-09 12:48:33.311 [INFO] probe: us178.vpnbook.com [us178.vpnbook.com] 30 ms
-2026-11-09 12:48:33.311 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 198 ms
-2026-11-09 12:48:33.312 [INFO] probe: vpn349305622 [38.73.242.33] no reply
-2026-11-09 12:48:33.312 [INFO] probe: vpn835304687 [169.231.240.152] no reply
-2026-11-09 12:48:33.312 [INFO] probe: vpn100383739 [128.211.249.131] 28 ms
-2026-11-09 12:48:33.312 [INFO] probe: vpn745412775 [47.159.161.160] no reply
-2026-11-09 12:48:33.312 [INFO] probe: vpn551628501 [76.167.43.6] 60 ms
-2026-11-09 12:48:33.313 [INFO] probe: vpn563780796 [71.208.73.227] 64 ms
-2026-11-09 12:48:33.313 [INFO] probe: vpn680288952 [47.25.225.222] no reply
-2026-11-09 12:48:33.327 [INFO] rank: vpn100383739 28 ms via udp/1195
-2026-11-09 12:48:33.328 [INFO] rank: us178.vpnbook.com 30 ms via udp/25000
-2026-11-09 12:48:33.328 [INFO] rank: us16.vpnbook.com 198 ms via udp/25000
-2026-11-09 12:48:33.328 [INFO] rank: vpn551628501 60 ms via tcp/1318
-2026-11-09 12:48:33.329 [INFO] preflight: 5/9 candidates answered
-2026-11-09 12:48:33.331 [INFO] preflight: skipped 4 dead nodes
-2026-11-09 12:48:33.331 [INFO] attempt 1/5: vpn100383739 (US)
-2026-11-09 12:48:33.333 [INFO] transport for vpn100383739: udp/1195
-2026-11-09 12:48:33.362 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-09 12:48:33.362 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-09 12:48:33.362 [INFO] config preview: # EndorVPN profile for vpn100383739 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 1 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote 128.211.249.131 1195 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw / TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVyb
-2026-11-09 12:48:34.770 [WARN] openvpn exited with 0
-2026-11-09 12:48:34.771 [WARN] server failed: vpn100383739 -> 2026-11-09 12:48:34 AUTH: Received control message: AUTH_FAILED
-2026-11-09 12:48:34.771 [INFO] attempt 2/5: us178.vpnbook.com (US)
-2026-11-09 12:48:34.772 [INFO] transport for us178.vpnbook.com: udp/25000
-2026-11-09 12:48:34.772 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
-2026-11-09 12:48:34.773 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
-2026-11-09 12:48:34.773 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 1 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us178.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / block-outside-dns / <ca> / -----BEGIN CERTIFICATE----- / MI
-2026-11-09 12:48:35.819 [INFO] latency measured for 37 servers
-2026-11-09 12:48:35.825 [INFO] render: begin
-2026-11-09 12:48:35.840 [INFO] render: ranking 19
-2026-11-09 12:48:35.842 [INFO] render: rows 5/19
-2026-11-09 12:48:35.843 [INFO] render: rows 10/19
-2026-11-09 12:48:35.851 [INFO] render: rows 15/19
-2026-11-09 12:48:35.853 [INFO] render: rows built 20
-2026-11-09 12:48:35.853 [INFO] render: servers=206 ranking=19 filter=all search=''
-2026-11-09 12:48:35.853 [INFO] latency probe finished
-2026-11-09 12:48:45.767 [WARN] ip provider failed http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query: A task was canceled.
-2026-11-09 12:48:46.027 [INFO] ip 147.135.37.178 via https://api.ipify.org?format=json
-2026-11-09 12:48:46.028 [INFO] tunnel up via us178.vpnbook.com, exit ip 147.135.37.178
-2026-11-09 12:48:46.088 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:48:47.661 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
-2026-11-09 12:48:49.210 [INFO] ip 52.161.51.48 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+﻿2026-11-09 13:23:47.755 [INFO] === EndorVPN 1.2.1 starting (admin=True) ===
+2026-11-09 13:23:48.019 [INFO] smoke: parsing D:\a\222\222\dist\EndorVPN\smoke-servers.csv
+2026-11-09 13:23:48.023 [INFO] parsed 16 servers
+2026-11-09 13:23:48.120 [INFO] server book: 16 servers in 8 countries
+2026-11-09 13:23:48.173 [INFO] server cache saved, 23 chars
+2026-11-09 13:23:48.180 [INFO] smoke exit 0
+2026-11-09 13:23:48.906 [INFO] === EndorVPN 1.2.1 starting (admin=True) ===
+2026-11-09 13:23:49.038 [INFO] ip 52.154.132.177 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-09 13:23:49.038 [INFO] e2e ip before: 52.154.132.177
+2026-11-09 13:23:49.305 [INFO] vpnbook credentials parsed
+2026-11-09 13:23:49.335 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
+2026-11-09 13:23:49.771 [INFO] vpnbook servers: 20
+2026-11-09 13:23:50.100 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 320 ms, 1320114 chars
+2026-11-09 13:23:50.110 [INFO] parsed 98 servers
+2026-11-09 13:23:52.275 [INFO] server list from https://www.vpngate.net/api/iphone/ in 2494 ms, 1333892 chars
+2026-11-09 13:23:52.280 [INFO] parsed 99 servers
+2026-11-09 13:23:53.097 [INFO] server list from http://www.vpngate.net/api/iphone/ in 3317 ms, 1333892 chars
+2026-11-09 13:23:53.103 [INFO] parsed 99 servers
+2026-11-09 13:23:53.111 [INFO] merged server list: 189 servers from 3 sources
+2026-11-09 13:23:53.113 [INFO] e2e candidates: 26
+2026-11-09 13:23:53.115 [INFO] e2e trying us16.vpnbook.com (US, vpnbook)
+2026-11-09 13:23:53.161 [INFO] running TAP installer
+2026-11-09 13:23:58.656 [INFO] adapter enable: exit 1 This network connection does not exist.
+2026-11-09 13:23:59.951 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 99 ms
+2026-11-09 13:23:59.977 [INFO] rank: us16.vpnbook.com 99 ms via udp/25000
+2026-11-09 13:23:59.977 [INFO] preflight: 1/1 candidates answered
+2026-11-09 13:23:59.979 [INFO] attempt 1/1: us16.vpnbook.com (US)
+2026-11-09 13:23:59.981 [INFO] transport for us16.vpnbook.com: udp/25000
+2026-11-09 13:23:59.993 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-09 13:23:59.993 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-09 13:23:59.993 [INFO] config preview: # EndorVPN profile for us16.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 12 / connect-retry 2 / ping 10 / ping-restart 120 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us16.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / <ca> / -----BE
+2026-11-09 13:24:13.803 [WARN] ip provider failed http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query: A task was canceled.
+2026-11-09 13:24:15.601 [INFO] ip 147.135.15.16 via https://api.ipify.org?format=json
+2026-11-09 13:24:15.601 [INFO] tunnel up via us16.vpnbook.com, exit ip 147.135.15.16
+2026-11-09 13:24:15.602 [INFO] e2e result: {"stage":"start","ipBefore":"52.154.132.177","ipAfter":"147.135.15.16","server":"us16.vpnbook.com","country":"US","provider":"vpnbook","connected":true,"ipChanged":true,"done":true}
+2026-11-09 13:24:18.650 [INFO] connect cancelled / disconnected
+2026-11-09 13:24:18.729 [INFO] e2e exit 0
+2026-11-09 13:24:33.715 [INFO] === EndorVPN 1.2.1 starting (admin=True) ===
+2026-11-09 13:24:35.463 [INFO] render: begin
+2026-11-09 13:24:35.637 [INFO] ip 52.154.132.177 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-09 13:24:35.690 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 120 ms, 1320114 chars
+2026-11-09 13:24:35.709 [INFO] parsed 98 servers
+2026-11-09 13:24:35.800 [INFO] vpnbook credentials parsed
+2026-11-09 13:24:35.853 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
+2026-11-09 13:24:36.370 [INFO] vpnbook servers: 20
+2026-11-09 13:24:38.367 [INFO] server list from http://www.vpngate.net/api/iphone/ in 2791 ms, 1333906 chars
+2026-11-09 13:24:38.374 [INFO] parsed 99 servers
+2026-11-09 13:24:38.616 [INFO] server list from https://www.vpngate.net/api/iphone/ in 3046 ms, 1333906 chars
+2026-11-09 13:24:38.623 [INFO] parsed 99 servers
+2026-11-09 13:24:38.630 [INFO] merged server list: 189 servers from 3 sources
+2026-11-09 13:24:38.632 [INFO] merged providers: 199 servers
+2026-11-09 13:24:38.636 [INFO] server book: 199 servers in 15 countries
+2026-11-09 13:24:38.642 [INFO] default country: US
+2026-11-09 13:24:38.674 [INFO] server cache saved, 2615715 chars
+2026-11-09 13:24:38.674 [INFO] render: begin
+2026-11-09 13:24:38.678 [INFO] render: ranking 15
+2026-11-09 13:24:38.723 [INFO] render: rows 5/15
+2026-11-09 13:24:38.725 [INFO] render: rows 10/15
+2026-11-09 13:24:38.727 [INFO] render: rows 15/15
+2026-11-09 13:24:38.727 [INFO] render: rows built 16
+2026-11-09 13:24:38.729 [INFO] render: servers=199 ranking=15 filter=all search=''
+2026-11-09 13:24:41.491 [INFO] connecting to US with 4 ranked candidates
+2026-11-09 13:24:49.721 [INFO] TAP adapter already present
+2026-11-09 13:24:50.109 [INFO] adapter enable: exit 1 This network connection does not exist.
+2026-11-09 13:24:51.366 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 877 ms
+2026-11-09 13:24:51.366 [INFO] probe: us178.vpnbook.com [us178.vpnbook.com] 52 ms
+2026-11-09 13:24:51.367 [INFO] probe: vpn386448989 [204.111.161.206] 57 ms
+2026-11-09 13:24:51.367 [INFO] probe: vpn800710384 [130.215.124.186] no reply
+2026-11-09 13:24:51.387 [INFO] rank: vpn386448989 57 ms via udp/6453
+2026-11-09 13:24:51.388 [INFO] rank: us178.vpnbook.com 52 ms via udp/25000
+2026-11-09 13:24:51.388 [INFO] rank: us16.vpnbook.com 877 ms via udp/25000
+2026-11-09 13:24:51.389 [INFO] preflight: 3/4 candidates answered
+2026-11-09 13:24:51.392 [INFO] preflight: skipped 1 dead nodes
+2026-11-09 13:24:51.392 [INFO] attempt 1/3: vpn386448989 (US)
+2026-11-09 13:24:51.395 [INFO] transport for vpn386448989: udp/6453
+2026-11-09 13:24:51.415 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-09 13:24:51.415 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-09 13:24:51.415 [INFO] config preview: # EndorVPN profile for vpn386448989 (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 12 / connect-retry 2 / ping 10 / ping-restart 120 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote 204.111.161.206 6453 / cipher AES-128-CBC / data-ciphers AES-128-CBC / auth SHA1 / <ca> / -----BEGIN CERTIFICATE----- / MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQ
+2026-11-09 13:24:53.289 [INFO] latency measured for 31 servers
+2026-11-09 13:24:53.289 [INFO] render: begin
+2026-11-09 13:24:53.293 [INFO] render: ranking 15
+2026-11-09 13:24:53.296 [INFO] render: rows 5/15
+2026-11-09 13:24:53.298 [INFO] render: rows 10/15
+2026-11-09 13:24:53.300 [INFO] render: rows 15/15
+2026-11-09 13:24:53.301 [INFO] render: rows built 16
+2026-11-09 13:24:53.301 [INFO] render: servers=199 ranking=15 filter=all search=''
+2026-11-09 13:24:53.301 [INFO] latency probe finished
+2026-11-09 13:25:03.542 [WARN] server failed: vpn386448989 -> no answer on 6453/udp
+2026-11-09 13:25:03.542 [INFO] attempt 2/3: us178.vpnbook.com (US)
+2026-11-09 13:25:03.543 [INFO] transport for us178.vpnbook.com: udp/25000
+2026-11-09 13:25:03.544 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-09 13:25:03.544 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-09 13:25:03.544 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 12 / connect-retry 2 / ping 10 / ping-restart 120 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us178.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / block-outsi
+2026-11-09 13:25:12.913 [INFO] === EndorVPN 1.2.1 starting (admin=True) ===
+2026-11-09 13:25:13.236 [INFO] render: begin
+2026-11-09 13:25:13.416 [INFO] server book: 199 servers in 15 countries
+2026-11-09 13:25:13.416 [INFO] render: begin
+2026-11-09 13:25:13.423 [INFO] render: ranking 15
+2026-11-09 13:25:13.444 [INFO] render: rows 5/15
+2026-11-09 13:25:13.446 [INFO] render: rows 10/15
+2026-11-09 13:25:13.449 [INFO] render: rows 15/15
+2026-11-09 13:25:13.449 [INFO] render: rows built 16
+2026-11-09 13:25:13.450 [INFO] render: servers=199 ranking=15 filter=all search=''
+2026-11-09 13:25:13.539 [INFO] ip 52.154.132.177 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-09 13:25:13.685 [INFO] vpnbook credentials parsed
+2026-11-09 13:25:13.743 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
+2026-11-09 13:25:13.792 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 313 ms, 1279850 chars
+2026-11-09 13:25:13.826 [INFO] parsed 95 servers
+2026-11-09 13:25:14.268 [INFO] vpnbook servers: 20
+2026-11-09 13:25:16.625 [INFO] server list from https://www.vpngate.net/api/iphone/ in 3149 ms, 1333873 chars
+2026-11-09 13:25:16.631 [INFO] parsed 99 servers
+2026-11-09 13:25:23.344 [INFO] server list from http://www.vpngate.net/api/iphone/ in 9866 ms, 1333873 chars
+2026-11-09 13:25:23.350 [INFO] parsed 99 servers
+2026-11-09 13:25:23.360 [INFO] merged server list: 189 servers from 3 sources
+2026-11-09 13:25:23.360 [INFO] merged providers: 199 servers
+2026-11-09 13:25:23.360 [INFO] server book: 199 servers in 17 countries
+2026-11-09 13:25:23.387 [INFO] server cache saved, 2615614 chars
+2026-11-09 13:25:23.387 [INFO] render: begin
+2026-11-09 13:25:23.389 [INFO] render: ranking 17
+2026-11-09 13:25:23.391 [INFO] render: rows 5/17
+2026-11-09 13:25:23.394 [INFO] render: rows 10/17
+2026-11-09 13:25:23.395 [INFO] render: rows 15/17
+2026-11-09 13:25:23.397 [INFO] render: rows built 18
+2026-11-09 13:25:23.397 [INFO] render: servers=199 ranking=17 filter=all search=''
+2026-11-09 13:25:35.026 [INFO] latency measured for 34 servers
+2026-11-09 13:25:35.026 [INFO] render: begin
+2026-11-09 13:25:35.030 [INFO] render: ranking 17
+2026-11-09 13:25:35.032 [INFO] render: rows 5/17
+2026-11-09 13:25:35.034 [INFO] render: rows 10/17
+2026-11-09 13:25:35.036 [INFO] render: rows 15/17
+2026-11-09 13:25:35.036 [INFO] render: rows built 18
+2026-11-09 13:25:35.036 [INFO] render: servers=199 ranking=17 filter=all search=''
+2026-11-09 13:25:35.036 [INFO] latency probe finished
+2026-11-09 13:25:36.237 [INFO] connecting to US with 3 ranked candidates
+2026-11-09 13:25:36.300 [INFO] TAP adapter already present
+2026-11-09 13:25:36.688 [INFO] adapter enable: exit 1 This network connection does not exist.
+2026-11-09 13:25:37.957 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 33 ms
+2026-11-09 13:25:37.958 [INFO] probe: us178.vpnbook.com [us178.vpnbook.com] 58 ms
+2026-11-09 13:25:37.958 [INFO] probe: vpn800710384 [130.215.124.186] no reply
+2026-11-09 13:25:37.991 [INFO] rank: us16.vpnbook.com 33 ms via udp/25000
+2026-11-09 13:25:37.992 [INFO] rank: us178.vpnbook.com 58 ms via udp/25000
+2026-11-09 13:25:37.993 [INFO] preflight: 2/3 candidates answered
+2026-11-09 13:25:37.996 [INFO] preflight: skipped 1 dead nodes
+2026-11-09 13:25:37.996 [INFO] attempt 1/2: us16.vpnbook.com (US)
+2026-11-09 13:25:37.998 [INFO] transport for us16.vpnbook.com: udp/25000
+2026-11-09 13:25:38.025 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-09 13:25:38.025 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-09 13:25:38.025 [INFO] config preview: # EndorVPN profile for us16.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 12 / connect-retry 2 / ping 10 / ping-restart 120 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us16.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / <ca> / -----BE
+2026-11-09 13:25:45.685 [INFO] user cancelled the connection attempt
+2026-11-09 13:25:59.901 [INFO] === EndorVPN 1.2.1 starting (admin=True) ===
+2026-11-09 13:26:00.237 [INFO] render: begin
+2026-11-09 13:26:00.416 [INFO] server book: 199 servers in 17 countries
+2026-11-09 13:26:00.416 [INFO] render: begin
+2026-11-09 13:26:00.423 [INFO] render: ranking 17
+2026-11-09 13:26:00.443 [INFO] render: rows 5/17
+2026-11-09 13:26:00.445 [INFO] render: rows 10/17
+2026-11-09 13:26:00.449 [INFO] render: rows 15/17
+2026-11-09 13:26:00.449 [INFO] render: rows built 18
+2026-11-09 13:26:00.449 [INFO] render: servers=199 ranking=17 filter=all search=''
+2026-11-09 13:26:00.556 [INFO] ip 52.154.132.177 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-09 13:26:00.584 [INFO] server list from https://raw.githubusercontent.com/rainsstory/vpngate-mirror/main/api/iphone/index.html in 105 ms, 1279850 chars
+2026-11-09 13:26:00.608 [INFO] parsed 95 servers
+2026-11-09 13:26:00.688 [INFO] vpnbook credentials parsed
+2026-11-09 13:26:00.741 [INFO] vpnbook hosts found: 10 (us16.vpnbook.com, us178.vpnbook.com, ca149.vpnbook.com, ca196.vpnbook.com, uk205.vpnbook.com, uk68.vpnbook.com, de20.vpnbook.com, de220.vpnbook.com, ...)
+2026-11-09 13:26:01.466 [INFO] vpnbook servers: 20
+2026-11-09 13:26:02.018 [INFO] server list from http://www.vpngate.net/api/iphone/ in 1528 ms, 1333873 chars
+2026-11-09 13:26:02.033 [INFO] parsed 99 servers
+2026-11-09 13:26:02.150 [INFO] server list from https://www.vpngate.net/api/iphone/ in 1668 ms, 1333873 chars
+2026-11-09 13:26:02.158 [INFO] parsed 99 servers
+2026-11-09 13:26:02.166 [INFO] merged server list: 189 servers from 3 sources
+2026-11-09 13:26:02.166 [INFO] merged providers: 199 servers
+2026-11-09 13:26:02.166 [INFO] server book: 199 servers in 17 countries
+2026-11-09 13:26:02.193 [INFO] server cache saved, 2615610 chars
+2026-11-09 13:26:02.193 [INFO] render: begin
+2026-11-09 13:26:02.196 [INFO] render: ranking 17
+2026-11-09 13:26:02.198 [INFO] render: rows 5/17
+2026-11-09 13:26:02.199 [INFO] render: rows 10/17
+2026-11-09 13:26:02.201 [INFO] render: rows 15/17
+2026-11-09 13:26:02.201 [INFO] render: rows built 18
+2026-11-09 13:26:02.201 [INFO] render: servers=199 ranking=17 filter=all search=''
+2026-11-09 13:26:09.483 [INFO] connecting to US with 3 ranked candidates
+2026-11-09 13:26:12.021 [INFO] TAP adapter already present
+2026-11-09 13:26:12.367 [INFO] adapter enable: exit 1 This network connection does not exist.
+2026-11-09 13:26:13.026 [INFO] latency measured for 34 servers
+2026-11-09 13:26:13.030 [INFO] render: begin
+2026-11-09 13:26:13.035 [INFO] render: ranking 17
+2026-11-09 13:26:13.037 [INFO] render: rows 5/17
+2026-11-09 13:26:13.040 [INFO] render: rows 10/17
+2026-11-09 13:26:13.042 [INFO] render: rows 15/17
+2026-11-09 13:26:13.043 [INFO] render: rows built 18
+2026-11-09 13:26:13.043 [INFO] render: servers=199 ranking=17 filter=all search=''
+2026-11-09 13:26:13.044 [INFO] latency probe finished
+2026-11-09 13:26:13.666 [INFO] probe: us178.vpnbook.com [us178.vpnbook.com] 443 ms
+2026-11-09 13:26:13.666 [INFO] probe: us16.vpnbook.com [us16.vpnbook.com] 56 ms
+2026-11-09 13:26:13.667 [INFO] probe: vpn800710384 [130.215.124.186] no reply
+2026-11-09 13:26:13.708 [INFO] rank: us178.vpnbook.com 443 ms via udp/25000
+2026-11-09 13:26:13.708 [INFO] rank: us16.vpnbook.com 56 ms via tcp/443
+2026-11-09 13:26:13.709 [INFO] preflight: 2/3 candidates answered
+2026-11-09 13:26:13.722 [INFO] preflight: skipped 1 dead nodes
+2026-11-09 13:26:13.722 [INFO] attempt 1/2: us178.vpnbook.com (US)
+2026-11-09 13:26:13.724 [INFO] transport for us178.vpnbook.com: udp/25000
+2026-11-09 13:26:13.756 [INFO] starting: openvpn --config D:\a\222\222\dist\EndorVPN\data\work\active.ovpn
+2026-11-09 13:26:13.757 [INFO] engine dir: D:\a\222\222\dist\EndorVPN\engine (openvpn exists=True)
+2026-11-09 13:26:13.757 [INFO] config preview: # EndorVPN profile for us178.vpnbook.com (US) / client / dev tun / nobind / persist-key / persist-tun / resolv-retry infinite / verb 3 / remote-cert-tls server / auth-nocache / route-delay 2 / ip-win32 netsh / connect-retry-max 12 / connect-retry 2 / ping 10 / ping-restart 120 / connect-timeout 8 / tun-mtu 1450 / mssfix 1380 / sndbuf 524288 / rcvbuf 524288 / tls-version-min 1.2 / windows-driver tap-windows6 / dev-node "EndorVPN" / proto udp / remote us178.vpnbook.com 25000 / auth-user-pass "D:/a/222/222/dist/EndorVPN/data/work/auth.txt" / cipher AES-256-GCM / data-ciphers AES-256-GCM:AES-128-GCM / auth SHA256 / <ca> / -----
+2026-11-09 13:26:24.846 [WARN] ip provider failed http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query: A task was canceled.
+2026-11-09 13:26:25.221 [INFO] ip 147.135.37.178 via https://api.ipify.org?format=json
+2026-11-09 13:26:25.221 [INFO] tunnel up via us178.vpnbook.com, exit ip 147.135.37.178
+2026-11-09 13:26:25.268 [INFO] ip 52.154.132.177 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-09 13:26:26.816 [INFO] ip 52.154.132.177 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query
+2026-11-09 13:26:28.347 [INFO] ip 52.154.132.177 (US) via http://ip-api.com/json/?fields=status,country,countryCode,city,isp,query

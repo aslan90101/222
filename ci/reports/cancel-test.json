@@ -1,9 +1,9 @@
 {
-  "sawCancel": true,
-  "cancelClicked": true,
-  "msToIdle": 366,
   "sawAttempt": true,
-  "ok": true,
   "launched": true,
+  "cancelClicked": true,
+  "sawCancel": true,
+  "msToIdle": 308,
+  "ok": true,
   "reconnectable": true
 }

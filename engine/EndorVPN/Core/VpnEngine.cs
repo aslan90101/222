@@ -43,6 +43,9 @@ namespace EndorVPN.Core
         private Process _proc;
 
         private CancellationTokenSource _watchCts;
+
+        private DateTime _lastProbeAt = DateTime.MinValue;
+        private HashSet<string> _lastProbeIds;
         private CancellationTokenSource _cts;
         private volatile string _lastLogLine = "";
 
@@ -93,12 +96,11 @@ namespace EndorVPN.Core
 
         /// <summary>How many ranked servers enter the preflight (cheap, parallel).</summary>
         /// <summary>
-        /// How many ranked servers enter the preflight. Probing is parallel and
-        /// capped at ~1.2 s per node, so a wider pool costs almost nothing and gives
-        /// many more chances to find a fast node - the old value of 20 left most of
-        /// a 99-server feed untried.
+        /// How many ranked servers enter the preflight. 40 was tried and made the
+        /// pre-connect pause longer than the extra choices were worth; 24 keeps the
+        /// wait near two seconds while still covering far more than the old 20.
         /// </summary>
-        public int PreflightPoolSize = 40;
+        public int PreflightPoolSize = 24;
 
         /// <summary>Set by the log pump when the peer rejects our credentials.</summary>
         private volatile bool _authRejected;
@@ -254,7 +256,27 @@ namespace EndorVPN.Core
             if (settings != null && string.Equals(settings.Transport, "direct", StringComparison.OrdinalIgnoreCase))
                 return candidates;
 
-            var gate = new SemaphoreSlim(8);
+            // Reuse a recent measurement. A user who cancels and immediately presses
+            // connect again should not sit through the whole probe cycle a second
+            // time; node reachability does not change inside a minute.
+            if (_lastProbeAt != DateTime.MinValue &&
+                (DateTime.UtcNow - _lastProbeAt).TotalSeconds < 60 &&
+                _lastProbeIds != null)
+            {
+                var cached = candidates.Where(c => _lastProbeIds.Contains(c.Id)).ToList();
+                if (cached.Count > 0)
+                {
+                    _log.Info("preflight: reusing results from " +
+                              (int)(DateTime.UtcNow - _lastProbeAt).TotalSeconds + "s ago (" + cached.Count + " alive)");
+                    return cached;
+                }
+            }
+
+            // 8 slots was tuned for a 20-node pool with one probe each. The pool is
+            // 40 now and a TCP profile needs up to four probes, so 40/8*1.2 s could
+            // exceed 20 s before the first attempt even started - visible as a long
+            // "checking" pause right after pressing connect or after cancelling.
+            var gate = new SemaphoreSlim(16);
             var tasks = new List<Task<(VpnServer srv, int ms)>>();
             int probedCount = 0;
             Stage(Loc.T("stage.probe") + " · 0/" + candidates.Count);
@@ -309,9 +331,15 @@ namespace EndorVPN.Core
             _log.Info("preflight: " + alive.Count + "/" + results.Length + " candidates answered");
             if (alive.Count == 0)
             {
+                // Do not cache an empty result: the next connect must probe again
+                // instead of inheriting "everything is dead" for a minute.
+                _lastProbeAt = DateTime.MinValue;
+                _lastProbeIds = null;
                 _log.Warn("preflight: nothing answered, trying top-ranked nodes anyway");
                 return candidates.Take(MaxAttempts).ToList();
             }
+            _lastProbeAt = DateTime.UtcNow;
+            _lastProbeIds = new HashSet<string>(alive.Select(r => r.srv.Id), StringComparer.OrdinalIgnoreCase);
             return alive.Select(r => r.srv).ToList();
         }
 

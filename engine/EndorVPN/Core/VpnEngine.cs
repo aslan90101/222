@@ -69,7 +69,7 @@ namespace EndorVPN.Core
         public TapManager Tap { get { return _tap; } }
 
         /// <summary>How long a single server gets to come up before we move on.</summary>
-        public int AttemptTimeoutSec = 15;
+        public int AttemptTimeoutSec = 12;
 
         /// <summary>Hard cap on attempts in one ConnectAsync call.</summary>
         public int MaxAttempts = 3;
@@ -172,10 +172,107 @@ namespace EndorVPN.Core
             }
         }
 
+        /// <summary>One transport option: TCP or UDP on a specific port.</summary>
+        private sealed class TransportPlan
+        {
+            public bool Tcp;
+            public int Port;
+            public int LatencyMs;
+            public override string ToString() { return (Tcp ? "tcp/" : "udp/") + Port; }
+        }
+
+        /// <summary>
+        /// Probes the node before committing 15 seconds to it.
+        ///
+        /// Dead nodes and firewalled ports are indistinguishable from a silent
+        /// TCP handshake, which is what made connecting feel endless: three
+        /// attempts, each staring at a frozen counter. A 1.2 s TCP connect test
+        /// tells us in a fraction of a second which port is even answering, and
+        /// the attempt then only tries transports that replied.
+        /// </summary>
+        private async Task<List<TransportPlan>> PlanTransportsAsync(string cfgText, VpnServer server, AppSettings settings, CancellationToken ct)
+        {
+            var plans = new List<TransportPlan>();
+            // the profile's own port first, then the usual VPN alternates
+            var candidates = new List<TransportPlan>();
+            bool profileTcp = cfgText != null && cfgText.IndexOf("proto tcp", StringComparison.OrdinalIgnoreCase) >= 0;
+            if (settings.Transport == "tcp") { candidates.Add(new TransportPlan { Tcp = true, Port = 443 }); }
+            else if (settings.Transport == "udp") { candidates.Add(new TransportPlan { Tcp = false, Port = 1194 }); }
+            else
+            {
+                if (profileTcp) candidates.Add(new TransportPlan { Tcp = true, Port = 443 });
+                else candidates.Add(new TransportPlan { Tcp = false, Port = 1194 });
+                candidates.Add(new TransportPlan { Tcp = true, Port = 443 });
+                candidates.Add(new TransportPlan { Tcp = false, Port = 25000 });
+            }
+
+            foreach (var plan in candidates)
+            {
+                if (ct.IsCancellationRequested) break;
+                if (plans.Any(p => p.Tcp == plan.Tcp && p.Port == plan.Port)) continue;
+                int ms = await ProbeTcpAsync(server.Host, plan.Port, 1200, ct).ConfigureAwait(false);
+                if (ms >= 0)
+                {
+                    plan.LatencyMs = ms;
+                    plans.Add(plan);
+                }
+                else
+                {
+                    _log.Info("probe: " + server.Host + " " + plan + " closed/filtered");
+                }
+                if (plans.Count >= 2) break;
+            }
+            foreach (var p in plans) _log.Info("probe: " + server.Host + " " + p + " reachable in " + p.LatencyMs + " ms");
+            return plans;
+        }
+
+        private static async Task<int> ProbeTcpAsync(string host, int port, int timeoutMs, CancellationToken ct)
+        {
+            try
+            {
+                using (var client = new System.Net.Sockets.TcpClient())
+                {
+                    var sw = Stopwatch.StartNew();
+                    var connect = client.ConnectAsync(host, port);
+                    var done = await Task.WhenAny(connect, Task.Delay(timeoutMs, ct)).ConfigureAwait(false);
+                    if (done != connect || !client.Connected) return -1;
+                    sw.Stop();
+                    return (int)sw.ElapsedMilliseconds;
+                }
+            }
+            catch { return -1; }
+        }
+
         private async Task<ConnectResult> TryServerAsync(VpnServer server, AppSettings settings, CancellationToken ct)
         {
-            var res = new ConnectResult { Server = server };
             string cfgText = ServerSource.DecodeConfig(server);
+            if (string.IsNullOrEmpty(cfgText))
+                return new ConnectResult { Server = server, ErrorKey = "err.network", Detail = "no config" };
+
+            var transports = await PlanTransportsAsync(cfgText, server, settings, ct).ConfigureAwait(false);
+            if (transports.Count == 0)
+            {
+                _log.Warn("no reachable transport for " + server.Host + " (443/1194/25000 closed or filtered)");
+                return new ConnectResult { Server = server, ErrorKey = "err.unreachable", Detail = "all ports filtered" };
+            }
+
+            ConnectResult last = null;
+            foreach (var plan in transports)
+            {
+                if (ct.IsCancellationRequested) break;
+                _log.Info("trying " + plan + " on " + server.Host + " (" + plan.LatencyMs + " ms)");
+                last = await RunOpenVpnOnceAsync(server, settings, cfgText, plan, ct).ConfigureAwait(false);
+                if (last.Ok) return last;
+                if (last.Cancelled) return last;
+                // an auth rejection is not transport related, no point retrying
+                if (last.ErrorKey == "err.auth") return last;
+            }
+            return last ?? new ConnectResult { Server = server, ErrorKey = "err.unreachable" };
+        }
+
+        private async Task<ConnectResult> RunOpenVpnOnceAsync(VpnServer server, AppSettings settings, string cfgText, TransportPlan plan, CancellationToken ct)
+        {
+            var res = new ConnectResult { Server = server };
             if (string.IsNullOrEmpty(cfgText))
             {
                 res.ErrorKey = "err.network";
@@ -207,6 +304,9 @@ namespace EndorVPN.Core
                           : ConfigBuilder.Transport.Auto,
                 ConnectTimeoutSec = 20,
             };
+            opts.Transport = plan.Tcp ? ConfigBuilder.Transport.Tcp : ConfigBuilder.Transport.Udp;
+            opts.RemotePort = plan.Port;
+
             string config = ConfigBuilder.Build(server, cfgText, opts);
             string cfgPath = Path.Combine(_paths.WorkDir, "active.ovpn");
             File.WriteAllText(cfgPath, config, new UTF8Encoding(false));
@@ -251,7 +351,7 @@ namespace EndorVPN.Core
             long readOffset = 0;
             bool timedOut = false;
 
-            long budget = Math.Max(8, AttemptTimeoutSec) * 1000L;
+            long budget = Math.Max(6, AttemptTimeoutSec) * 1000L;
             var hostStage = Loc.T("stage.tunnel") + " · " + server.Host;
             Stage(hostStage);
             while (sw.ElapsedMilliseconds < budget)

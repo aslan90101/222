@@ -29,6 +29,9 @@ namespace EndorVPN.Core
             public bool UseWintun;
             public int ConnectTimeoutSec = 25;
             public int TunMtu = 1450;
+
+            /// <summary>Override the profile's own port (transport probing).</summary>
+            public int RemotePort;
         }
 
         public enum Transport { Auto, Tcp, Udp }
@@ -96,9 +99,16 @@ namespace EndorVPN.Core
             }
             if (tcp) outLines.Add("proto tcp");
             else outLines.Add("proto udp");
-            outLines.Add("remote " + remoteHost + " 443");
-            outLines.Add("remote " + remoteHost + " 1194");
-            if (remoteIsDomain) outLines.Add("remote-random");
+            if (opts.RemotePort > 0)
+            {
+                outLines.Add("remote " + remoteHost + " " + opts.RemotePort);
+            }
+            else
+            {
+                outLines.Add("remote " + remoteHost + " 443");
+                outLines.Add("remote " + remoteHost + " 1194");
+                if (remoteIsDomain) outLines.Add("remote-random");
+            }
 
             if (!string.IsNullOrEmpty(opts.AuthFile))
             {

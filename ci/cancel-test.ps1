@@ -91,7 +91,9 @@ Write-Host "cancel seen: $($result.sawCancel), engine idle after $($result.msToI
 $before = (Read-NewLog)
 Invoke-ById "PowerButton" | Out-Null
 $reconnectable = $false
-for ($i = 0; $i -lt 20; $i++) {
+# the reconnect has to re-run the preflight (up to 40 nodes at ~1.2 s each in
+# batches of 8), so 10 s was not enough and the check failed spuriously
+for ($i = 0; $i -lt 70; $i++) {
   Start-Sleep -Milliseconds 500
   $delta = (Read-NewLog).Substring([Math]::Min($before.Length, (Read-NewLog).Length))
   if ($delta -match "attempt \d+/\d+: ") { $reconnectable = $true; break }

@@ -1,14 +1,16 @@
   Determining projects to restore...
-  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 214 ms).
+  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 175 ms).
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1379,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(198,24): warning CS0649: Field 'VpnEngine.TransportPlan.LatencyMs' is never assigned to, and will always have its default value 0 [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
   EndorVPN -> D:\a\222\222\engine\EndorVPN\bin\x64\Release\net48\EndorVPN.exe
 
 Build succeeded.
 
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1379,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(198,24): warning CS0649: Field 'VpnEngine.TransportPlan.LatencyMs' is never assigned to, and will always have its default value 0 [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-    2 Warning(s)
+    3 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:08.92
+Time Elapsed 00:00:08.70

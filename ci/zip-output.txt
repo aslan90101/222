@@ -1,12 +1,12 @@
 **********************
 PowerShell transcript start
-Start time: 20261109002455
+Start time: 20261109003818
 Username: runnervmm7ud1\runneradmin
 RunAs User: runnervmm7ud1\runneradmin
 Configuration Name: 
 Machine: runnervmm7ud1 (Microsoft Windows NT 10.0.26100.0)
-Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\bdebc295-a4d4-4e26-bde1-06310930df64.ps1'
-Process ID: 8104
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\2fe37403-1f0f-4b51-86ef-eacfc22dffb0.ps1'
+Process ID: 5800
 PSVersion: 7.6.9
 PSEdition: Core
 GitCommitId: 7.6.9
@@ -21,12 +21,12 @@ WSManStackVersion: 3.0
 Name               Length
 ----               ------
 EndorVPN
-EndorVPN-win64.zip 6084714
-EndorVPN.exe       6120131
+EndorVPN-win64.zip 6062888
+EndorVPN.exe       6098305
 
-folder bytes: 12437586
-zip bytes: 6084714
+folder bytes: 12389768
+zip bytes: 6062888
 **********************
 PowerShell transcript end
-End time: 20261109002458
+End time: 20261109003821
 **********************

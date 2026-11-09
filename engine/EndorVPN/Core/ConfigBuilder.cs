@@ -35,6 +35,13 @@ namespace EndorVPN.Core
 
             /// <summary>Suppress block-outside-dns (it can starve the TAP DHCP lease).</summary>
             public bool NoDnsBlock;
+
+            /// <summary>
+            /// Add a public DNS pair. Off by default: VPN Gate pushes 10.211.254.254
+            /// and 8.8.8.8, VPNBook pushes 1.1.1.1 and 8.8.8.8 - adding ours always
+            /// collides with one of them and netsh rejects the duplicate as fatal.
+            /// </summary>
+            public bool FallbackDns;
         }
 
         public enum Transport { Auto, Tcp, Udp }
@@ -153,16 +160,33 @@ namespace EndorVPN.Core
                 }
             }
 
-            // A public DNS pair on top of whatever the server pushes. If the server
-            // pushes block-outside-dns, DNS resets to the adapter's resolver anyway.
-            outLines.Add("dhcp-option DNS 1.1.1.1");
-            outLines.Add("dhcp-option DNS 8.8.8.8");
+            // Do NOT add our own dhcp-option DNS lines here.
+            //
+            // OpenVPN merges config DNS with the server's PUSH_REPLY list and then
+            // feeds each entry to "netsh interface ip add dns". Both VPN Gate and
+            // VPNBook push 8.8.8.8, so adding our own pair produced a duplicate -
+            // and netsh fails on a duplicate ("the object already exists"), which
+            // OpenVPN treats as fatal: "NETSH: command failed / Exiting due to
+            // fatal error". That is exactly what killed the tunnel after a full
+            // successful TLS handshake and PUSH_REPLY.
+            //
+            // The pushed DNS servers are enough; only fall back when the profile
+            // itself brings none and the user asked for a specific pair.
+            if (opts.FallbackDns)
+            {
+                outLines.Add("dhcp-option DNS 1.1.1.1");
+                outLines.Add("dhcp-option DNS 9.9.9.9");
+            }
             // block-outside-dns installs WFP filters for the whole session. On some
             // Windows builds those filters also swallow the DHCP lease renewal that
             // brings the TAP interface up, which is the one thing we cannot afford.
-            // The pushed DNS servers above already win the metric, so drop the block.
             if (!opts.NoDnsBlock) outLines.Add("block-outside-dns");
-            outLines.Add("redirect-gateway def1 bypass-dhcp");
+            // redirect-gateway is pushed by both providers. Adding our own makes
+            // openvpn warn "redirect-gateway and redirect-private at the same time"
+            // and can install the default route twice. Only add it when the profile
+            // does not already carry it (VPNBook profiles do).
+            if (!head.Any(l => l.StartsWith("redirect-gateway", StringComparison.OrdinalIgnoreCase)))
+                outLines.Add("redirect-gateway def1");
 
             var sb = new StringBuilder();
             foreach (var l in outLines) sb.AppendLine(l);

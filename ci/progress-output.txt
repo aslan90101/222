@@ -1,14 +1,10 @@
-distinct hint texts: 25
+distinct hint texts: 8
   Preparing network adapter… · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 14s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 13s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 12s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 11s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 10s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 9s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 8s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 7s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 6s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 5s · click to cancel
+  Establishing tunnel… · us178.vpnbook.com · click to cancel
+  Establishing tunnel… · us178.vpnbook.com · 11s · click to cancel
+  Establishing tunnel… · us178.vpnbook.com · 10s · click to cancel
+  Establishing tunnel… · us178.vpnbook.com · 9s · click to cancel
+  Configuring routes… · click to cancel
+  Verifying new IP… · click to cancel
+  Click to disconnect
 ok=True

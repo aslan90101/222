@@ -134,6 +134,48 @@ namespace EndorVPN.Core
             return AdapterExists();
         }
 
+        /// <summary>
+        /// A TAP adapter that Windows has administratively disabled still lists fine
+        /// in tapctl but never takes an address, which makes OpenVPN loop on
+        /// "Route: Waiting for TUN/TAP interface to come up" until timeout. Turn it
+        /// back on before connecting - this is the usual fix on a machine where the
+        /// adapter was disabled by hand or by a previous VPN client.
+        /// </summary>
+        public void EnsureEnabled()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("netsh",
+                    "interface set interface name=\"" + AdapterName + "\" admin=enable")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                };
+                using (var p = Process.Start(psi))
+                {
+                    string outp = p.StandardOutput.ReadToEnd();
+                    string err = p.StandardError.ReadToEnd();
+                    p.WaitForExit(8000);
+                    _log.Info("adapter enable: exit " + p.ExitCode +
+                              (string.IsNullOrWhiteSpace(outp) ? "" : " " + outp.Trim()) +
+                              (string.IsNullOrWhiteSpace(err) ? "" : " " + err.Trim()));
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Warn("adapter enable failed: " + ex.Message);
+            }
+        }
+
+        /// <summary>True when the adapter reports an IPv4 address bound to it.</summary>
+        public bool HasAddress()
+        {
+            var ip = GetAdapterIp();
+            return !string.IsNullOrWhiteSpace(ip) && ip != "0.0.0.0";
+        }
+
         public bool RemoveAdapter()
         {
             try

@@ -32,6 +32,9 @@ namespace EndorVPN.Core
 
             /// <summary>Override the profile's own port (transport probing).</summary>
             public int RemotePort;
+
+            /// <summary>Suppress block-outside-dns (it can starve the TAP DHCP lease).</summary>
+            public bool NoDnsBlock;
         }
 
         public enum Transport { Auto, Tcp, Udp }
@@ -87,6 +90,12 @@ namespace EndorVPN.Core
             outLines.Add("remote-cert-tls server");
             outLines.Add("auth-nocache");
             outLines.Add("route-delay 1");
+            // TAP-Windows6 emulates a DHCP server and leaves the interface down
+            // until Windows accepts the lease. When the DHCP Client service is
+            // disabled/slow the adapter never comes up and OpenVPN spins forever on
+            // "Route: Waiting for TUN/TAP interface to come up". netsh sets the
+            // address directly, no lease involved.
+            outLines.Add("ip-win32 netsh");
             outLines.Add("connect-retry-max 1");
             outLines.Add("connect-timeout " + Math.Max(8, opts.ConnectTimeoutSec));
             outLines.Add("tun-mtu " + opts.TunMtu);
@@ -148,7 +157,11 @@ namespace EndorVPN.Core
             // pushes block-outside-dns, DNS resets to the adapter's resolver anyway.
             outLines.Add("dhcp-option DNS 1.1.1.1");
             outLines.Add("dhcp-option DNS 8.8.8.8");
-            outLines.Add("block-outside-dns");
+            // block-outside-dns installs WFP filters for the whole session. On some
+            // Windows builds those filters also swallow the DHCP lease renewal that
+            // brings the TAP interface up, which is the one thing we cannot afford.
+            // The pushed DNS servers above already win the metric, so drop the block.
+            if (!opts.NoDnsBlock) outLines.Add("block-outside-dns");
             outLines.Add("redirect-gateway def1 bypass-dhcp");
 
             var sb = new StringBuilder();

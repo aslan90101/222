@@ -576,6 +576,14 @@ namespace EndorVPN
                 }
                 if (!result.Ok)
                 {
+                    // A local driver problem fails identically on every server, so
+                    // switching providers would only waste another minute.
+                    if (result.ErrorKey == "err.adapter" || result.ErrorKey == "err.driver")
+                    {
+                        SetState(VpnEngine.State.Idle);
+                        Toast(Loc.T("toast.failed") + ": " + Loc.T(result.ErrorKey), ToastKind.Err);
+                        return;
+                    }
                     // Free VPN Gate nodes reject anonymous logins from many IPs.
                     // Before giving up, try the stable VPNBook pool in the same
                     // country (or the nearest one that exists).

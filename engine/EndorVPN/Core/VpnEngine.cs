@@ -43,6 +43,11 @@ namespace EndorVPN.Core
         private Process _proc;
         private CancellationTokenSource _cts;
         private volatile string _lastLogLine = "";
+
+        /// <summary>Counts "Waiting for TUN/TAP interface" lines: the adapter is not coming up.</summary>
+        private int _routeStuck;
+
+        private volatile bool _noDnsBlockThisAttempt;
         private volatile bool _tunnelUp;
 
         public State CurrentState { get; private set; }
@@ -72,7 +77,7 @@ namespace EndorVPN.Core
         public int AttemptTimeoutSec = 12;
 
         /// <summary>Hard cap on attempts in one ConnectAsync call.</summary>
-        public int MaxAttempts = 3;
+        public int MaxAttempts = 5;
 
         /// <summary>How many ranked servers enter the preflight (cheap, parallel).</summary>
         public int PreflightPoolSize = 20;
@@ -104,6 +109,9 @@ namespace EndorVPN.Core
                     result.Detail = "TAP adapter unavailable";
                     return result;
                 }
+
+                // a disabled adapter accepts no address, and openvpn then waits forever
+                await Task.Run(() => _tap.EnsureEnabled());
 
                 var candidates = new List<VpnServer>();
                 if (server != null) candidates.Add(server);
@@ -138,6 +146,10 @@ namespace EndorVPN.Core
                 {
                     if (_cts.IsCancellationRequested) break;
                     if (attemptNo++ >= MaxAttempts) break;
+                    // The DNS block is a nicety; bringing the interface up is not.
+                    // First attempt runs without it so a WFP quirk cannot cost the
+                    // whole connection.
+                    _noDnsBlockThisAttempt = attemptNo == 1;
                     Stage(Loc.T("stage.tunnel") + " · " + candidate.Host);
                     _log.Info("attempt " + attemptNo + "/" + Math.Min(candidates.Count, MaxAttempts) +
                               ": " + candidate.Host + " (" + candidate.CountryCode + ")");
@@ -430,6 +442,7 @@ namespace EndorVPN.Core
                           : settings.Transport == "udp" ? ConfigBuilder.Transport.Udp
                           : ConfigBuilder.Transport.Auto,
                 ConnectTimeoutSec = 8,
+                NoDnsBlock = _noDnsBlockThisAttempt,
             };
             opts.Transport = plan.Tcp ? ConfigBuilder.Transport.Tcp : ConfigBuilder.Transport.Udp;
             opts.RemotePort = plan.Port;
@@ -474,6 +487,11 @@ namespace EndorVPN.Core
 
             _tunnelUp = false;
             _authRejected = false;
+            // A previous attempt's failure text must never be reported as this
+            // server's reason - uk205.vpnbook.com was blamed for an AUTH_FAILED
+            // that happened on the VPN Gate node before it.
+            _lastLogLine = "";
+            _routeStuck = 0;
             var sw = Stopwatch.StartNew();
             long readOffset = 0;
             bool timedOut = false;
@@ -515,6 +533,20 @@ namespace EndorVPN.Core
 
                 readOffset = PumpLog(logPath, readOffset);
                 if (_tunnelUp) break;
+
+                // Six "Waiting for TUN/TAP interface" lines means the adapter is not
+                // taking an address; more waiting cannot fix that, and the driver is
+                // the same for every server, so report it instead of burning 3 more
+                // attempts on nodes that would fail identically.
+                if (_routeStuck >= 6)
+                {
+                    _log.Error("TAP interface did not come up - check that the adapter '" +
+                               TapManager.AdapterName + "' is enabled in ncpa.cpl");
+                    StopProcess();
+                    res.ErrorKey = "err.adapter";
+                    res.Detail = "TAP interface did not come up";
+                    return res;
+                }
             }
 
             if (!_tunnelUp)
@@ -589,6 +621,10 @@ namespace EndorVPN.Core
                                 if (line.IndexOf("AUTH_FAILED", StringComparison.OrdinalIgnoreCase) >= 0)
                                     _authRejected = true;
                             }
+                            // The TAP interface never coming up is fatal in practice:
+                            // openvpn retries "Waiting for TUN/TAP interface" forever.
+                            if (line.IndexOf("Waiting for TUN/TAP interface", StringComparison.OrdinalIgnoreCase) >= 0)
+                                _routeStuck++;
                             var h = LogLine;
                             if (h != null && line.Length > 0) h("  " + line.Trim());
                         }

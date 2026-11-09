@@ -1,15 +1,15 @@
 UIA: invoked 'PowerButton'
-attempt started: True after 13829 ms
+attempt started: True after 14384 ms
 UIA: invoked 'PowerButton'
-cancel seen: True, engine idle after 314 ms
+cancel seen: True, engine idle after 328 ms
 UIA: invoked 'PowerButton'
 engine reusable after cancel: True
 {
-  "cancelClicked": true,
   "launched": true,
   "sawCancel": true,
-  "ok": true,
+  "cancelClicked": true,
+  "msToIdle": 328,
   "sawAttempt": true,
-  "msToIdle": 314,
+  "ok": true,
   "reconnectable": true
 }

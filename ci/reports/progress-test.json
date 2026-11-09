@@ -1,4 +1,5 @@
 {
+  "launched": true,
   "samples": [
     "Preparing network adapter… · click to cancel",
     "Preparing network adapter… · click to cancel",
@@ -10,15 +11,15 @@
     "Preparing network adapter… · click to cancel",
     "Preparing network adapter… · click to cancel",
     "Preparing network adapter… · click to cancel",
-    "Checking which servers answer… · 1/3 · click to cancel",
-    "Checking which servers answer… · 1/3 · click to cancel",
-    "Checking which servers answer… · 1/3 · click to cancel",
-    "Checking which servers answer… · 1/3 · click to cancel",
-    "Checking which servers answer… · 2/3 · click to cancel",
-    "Checking which servers answer… · 2/3 · click to cancel",
-    "Checking which servers answer… · 3/3 · click to cancel",
+    "Preparing network adapter… · click to cancel",
+    "Preparing network adapter… · click to cancel",
+    "Checking which servers answer… · 0/4 · click to cancel",
+    "Checking which servers answer… · 0/4 · click to cancel",
     "Establishing tunnel… · us178.vpnbook.com · 11s · click to cancel",
     "Establishing tunnel… · us178.vpnbook.com · 10s · click to cancel",
+    "Establishing tunnel… · us178.vpnbook.com · 10s · click to cancel",
+    "Establishing tunnel… · us178.vpnbook.com · 9s · click to cancel",
+    "Configuring routes… · click to cancel",
     "Configuring routes… · click to cancel",
     "Verifying new IP… · click to cancel",
     "Verifying new IP… · click to cancel",
@@ -29,10 +30,10 @@
     "Verifying new IP… · click to cancel",
     "Verifying new IP… · click to cancel",
     "Verifying new IP… · click to cancel",
-    "Verifying new IP… · click to cancel",
-    "Verifying new IP… · click to cancel",
-    "Verifying new IP… · click to cancel",
-    "Verifying new IP… · click to cancel",
+    "Click to disconnect",
+    "Click to disconnect",
+    "Click to disconnect",
+    "Click to disconnect",
     "Click to disconnect",
     "Click to disconnect",
     "Click to disconnect",
@@ -43,7 +44,6 @@
     "Click to disconnect",
     "Click to disconnect"
   ],
-  "ok": true,
-  "launched": true,
-  "distinctStages": 9
+  "distinctStages": 8,
+  "ok": true
 }

@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  VERSION: 1.1.2
+  VERSION: 1.1.3
   OPENVPN_MSI: https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.12-I001-amd64.msi
   TAP_INSTALLER: https://build.openvpn.net/downloads/releases/tap-windows-9.24.7-I601-Win10.exe
 
@@ -207,6 +207,8 @@ jobs:
           3. Выберите страну и нажмите большую кнопку. TAP-драйвер установится сам.
 
           **Что нового в $env:VERSION**
+          - Статус подключения живой: под кнопкой идёт обратный отсчёт (``us16.vpnbook.com · 12s``) и номер попытки (``attempt 2/3``), зависаний больше нет.
+          - Попытка обрывается жёстко по таймауту: процесс openvpn убивается сразу, без 4-секундного ожидания taskkill.
           - Кнопка питания теперь отменяет подключение: нажатие во время ``Connecting`` обрывает попытку примерно за 0.3 секунды.
           - Убран бесконечный ``Connecting``: у каждой попытки жёсткий лимит, всего не больше 3 попыток.
           - Исправлен ``installer payload offset mismatch``: установщик в одном файле корректно распаковывается.

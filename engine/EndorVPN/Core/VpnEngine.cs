@@ -74,6 +74,12 @@ namespace EndorVPN.Core
         /// <summary>Hard cap on attempts in one ConnectAsync call.</summary>
         public int MaxAttempts = 3;
 
+        /// <summary>How many ranked servers enter the preflight (cheap, parallel).</summary>
+        public int PreflightPoolSize = 20;
+
+        /// <summary>Set by the preflight: did any candidate answer on TCP?</summary>
+        private bool _preflightFoundTcp = true;
+
         /// <summary>Set by the log pump when the peer rejects our credentials.</summary>
         private volatile bool _authRejected;
 
@@ -106,14 +112,29 @@ namespace EndorVPN.Core
                 if (server != null) candidates.Add(server);
                 if (alternatives != null)
                 {
+                    // build a wide list; the preflight drops dead nodes in ~1.2 s
                     foreach (var alt in alternatives)
                     {
-                        if (candidates.Count >= MaxAttempts) break;
+                        if (candidates.Count >= PreflightPoolSize) break;
                         if (alt == null) continue;
                         if (candidates.Any(c => c.Ip == alt.Ip)) continue;
                         candidates.Add(alt);
                     }
                 }
+
+                Stage(Loc.T("stage.probe"));
+                var probed = await PreflightAsync(candidates, settings, _cts.Token).ConfigureAwait(false);
+                if (probed.Count == 0)
+                {
+                    _log.Warn("preflight: every candidate is unreachable from this network");
+                    result.ErrorKey = "err.unreachable";
+                    result.Detail = "all candidates filtered";
+                    SetState(State.Idle);
+                    return result;
+                }
+                if (probed.Count < candidates.Count)
+                    _log.Info("preflight: skipped " + (candidates.Count - probed.Count) + " dead nodes");
+                candidates = probed;
 
                 int attemptNo = 0;
                 foreach (var candidate in candidates)
@@ -182,49 +203,72 @@ namespace EndorVPN.Core
         }
 
         /// <summary>
-        /// Probes the node before committing 15 seconds to it.
+        /// Measures a whole candidate list in parallel before any tunnel is started.
         ///
-        /// Dead nodes and firewalled ports are indistinguishable from a silent
-        /// TCP handshake, which is what made connecting feel endless: three
-        /// attempts, each staring at a frozen counter. A 1.2 s TCP connect test
-        /// tells us in a fraction of a second which port is even answering, and
-        /// the attempt then only tries transports that replied.
+        /// The reported dead end was exactly this: three KR nodes, each burning a
+        /// full 15 s attempt on "Attempting to establish TCP connection", ending in
+        /// "not connected" after ~45 s of nothing. A TCP connect either completes
+        /// in a few hundred ms or the port is filtered - probing all 20 candidates
+        /// concurrently costs ~1.2 s total and tells us who is worth trying.
         /// </summary>
-        private async Task<List<TransportPlan>> PlanTransportsAsync(string cfgText, VpnServer server, AppSettings settings, CancellationToken ct)
+        private async Task<List<VpnServer>> PreflightAsync(List<VpnServer> candidates, AppSettings settings, CancellationToken ct)
         {
-            var plans = new List<TransportPlan>();
-            // the profile's own port first, then the usual VPN alternates
-            var candidates = new List<TransportPlan>();
-            bool profileTcp = cfgText != null && cfgText.IndexOf("proto tcp", StringComparison.OrdinalIgnoreCase) >= 0;
-            if (settings.Transport == "tcp") { candidates.Add(new TransportPlan { Tcp = true, Port = 443 }); }
-            else if (settings.Transport == "udp") { candidates.Add(new TransportPlan { Tcp = false, Port = 1194 }); }
-            else
+            if (settings != null && string.Equals(settings.Transport, "direct", StringComparison.OrdinalIgnoreCase))
+                return candidates;
+
+            var gate = new SemaphoreSlim(8);
+            var tasks = new List<Task<(VpnServer srv, int ms)>>();
+            int probedCount = 0;
+            Stage(Loc.T("stage.probe") + " · 0/" + candidates.Count);
+            foreach (var srv in candidates)
             {
-                if (profileTcp) candidates.Add(new TransportPlan { Tcp = true, Port = 443 });
-                else candidates.Add(new TransportPlan { Tcp = false, Port = 1194 });
-                candidates.Add(new TransportPlan { Tcp = true, Port = 443 });
-                candidates.Add(new TransportPlan { Tcp = false, Port = 25000 });
+                var s = srv;
+                tasks.Add(Task.Run(async () =>
+                {
+                    await gate.WaitAsync(ct).ConfigureAwait(false);
+                    try
+                    {
+                        int best = int.MaxValue;
+                        foreach (int port in ProbePorts)
+                        {
+                            int ms = await ProbeTcpAsync(s.Host, port, ProbeTimeoutMs, ct).ConfigureAwait(false);
+                            if (ms >= 0 && ms < best) best = ms;
+                        }
+                        return (s, best == int.MaxValue ? -1 : best);
+                    }
+                    finally
+                    {
+                        gate.Release();
+                        int done = Interlocked.Increment(ref probedCount);
+                        Stage(Loc.T("stage.probe") + " · " + done + "/" + candidates.Count);
+                    }
+                }, ct));
             }
 
-            foreach (var plan in candidates)
+            (VpnServer srv, int ms)[] results;
+            try { results = await Task.WhenAll(tasks).ConfigureAwait(false); }
+            catch { return candidates; }
+
+            var alive = results.Where(r => r.ms >= 0).OrderBy(r => r.ms).ToList();
+            foreach (var r in results)
+                _log.Info("probe: " + r.srv.Host + " " + (r.ms >= 0 ? r.ms + " ms" : "unreachable"));
+            _log.Info("preflight: " + alive.Count + "/" + results.Length + " candidates answered");
+
+            _preflightFoundTcp = alive.Count > 0;
+            if (alive.Count == 0)
             {
-                if (ct.IsCancellationRequested) break;
-                if (plans.Any(p => p.Tcp == plan.Tcp && p.Port == plan.Port)) continue;
-                int ms = await ProbeTcpAsync(server.Host, plan.Port, 1200, ct).ConfigureAwait(false);
-                if (ms >= 0)
-                {
-                    plan.LatencyMs = ms;
-                    plans.Add(plan);
-                }
-                else
-                {
-                    _log.Info("probe: " + server.Host + " " + plan + " closed/filtered");
-                }
-                if (plans.Count >= 2) break;
+                // No TCP answer anywhere. That can mean the whole range is dead,
+                // or that this network filters TCP while UDP still flows - which
+                // is common for VPN traffic. Fall back to the best-ranked nodes
+                // over UDP rather than declaring the network hopeless.
+                _log.Warn("preflight: no TCP answer, falling back to UDP on top-ranked nodes");
+                return candidates.Take(MaxAttempts).ToList();
             }
-            foreach (var p in plans) _log.Info("probe: " + server.Host + " " + p + " reachable in " + p.LatencyMs + " ms");
-            return plans;
+            return alive.Select(r => r.srv).ToList();
         }
+
+        private const int ProbeTimeoutMs = 1200;
+        private static readonly int[] ProbePorts = { 443, 1194, 25000 };
 
         private static async Task<int> ProbeTcpAsync(string host, int port, int timeoutMs, CancellationToken ct)
         {
@@ -235,7 +279,9 @@ namespace EndorVPN.Core
                     var sw = Stopwatch.StartNew();
                     var connect = client.ConnectAsync(host, port);
                     var done = await Task.WhenAny(connect, Task.Delay(timeoutMs, ct)).ConfigureAwait(false);
-                    if (done != connect || !client.Connected) return -1;
+                    if (done != connect) return -1;
+                    await connect.ConfigureAwait(false);
+                    if (!client.Connected) return -1;
                     sw.Stop();
                     return (int)sw.ElapsedMilliseconds;
                 }
@@ -249,25 +295,34 @@ namespace EndorVPN.Core
             if (string.IsNullOrEmpty(cfgText))
                 return new ConnectResult { Server = server, ErrorKey = "err.network", Detail = "no config" };
 
-            var transports = await PlanTransportsAsync(cfgText, server, settings, ct).ConfigureAwait(false);
-            if (transports.Count == 0)
+            var plan = PickTransport(server, cfgText, settings);
+            if (_preflightFoundTcp == false && plan.Tcp)
             {
-                _log.Warn("no reachable transport for " + server.Host + " (443/1194/25000 closed or filtered)");
-                return new ConnectResult { Server = server, ErrorKey = "err.unreachable", Detail = "all ports filtered" };
+                // nothing answered on TCP during preflight; do not repeat it
+                plan = new TransportPlan { Tcp = false, Port = 1194 };
+                _log.Info("transport for " + server.Host + ": switching to " + plan + " (no TCP answer)");
             }
+            else
+            {
+                _log.Info("transport for " + server.Host + ": " + plan);
+            }
+            return await RunOpenVpnOnceAsync(server, settings, cfgText, plan, ct).ConfigureAwait(false);
+        }
 
-            ConnectResult last = null;
-            foreach (var plan in transports)
-            {
-                if (ct.IsCancellationRequested) break;
-                _log.Info("trying " + plan + " on " + server.Host + " (" + plan.LatencyMs + " ms)");
-                last = await RunOpenVpnOnceAsync(server, settings, cfgText, plan, ct).ConfigureAwait(false);
-                if (last.Ok) return last;
-                if (last.Cancelled) return last;
-                // an auth rejection is not transport related, no point retrying
-                if (last.ErrorKey == "err.auth") return last;
-            }
-            return last ?? new ConnectResult { Server = server, ErrorKey = "err.unreachable" };
+        /// <summary>
+        /// The profile names its own protocol; follow it, but allow the user to
+        /// force tcp or udp. Never mix the two on one port - OpenVPN cannot.
+        /// </summary>
+        private static TransportPlan PickTransport(VpnServer server, string cfgText, AppSettings settings)
+        {
+            string forced = settings == null ? null : settings.Transport;
+            if (string.Equals(forced, "tcp", StringComparison.OrdinalIgnoreCase))
+                return new TransportPlan { Tcp = true, Port = 443 };
+            if (string.Equals(forced, "udp", StringComparison.OrdinalIgnoreCase))
+                return new TransportPlan { Tcp = false, Port = 1194 };
+
+            bool tcp = cfgText != null && cfgText.IndexOf("proto tcp", StringComparison.OrdinalIgnoreCase) >= 0;
+            return new TransportPlan { Tcp = tcp, Port = tcp ? 443 : 1194 };
         }
 
         private async Task<ConnectResult> RunOpenVpnOnceAsync(VpnServer server, AppSettings settings, string cfgText, TransportPlan plan, CancellationToken ct)
@@ -302,7 +357,7 @@ namespace EndorVPN.Core
                 Transport = settings.Transport == "tcp" ? ConfigBuilder.Transport.Tcp
                           : settings.Transport == "udp" ? ConfigBuilder.Transport.Udp
                           : ConfigBuilder.Transport.Auto,
-                ConnectTimeoutSec = 20,
+                ConnectTimeoutSec = 8,
             };
             opts.Transport = plan.Tcp ? ConfigBuilder.Transport.Tcp : ConfigBuilder.Transport.Udp;
             opts.RemotePort = plan.Port;
@@ -393,6 +448,11 @@ namespace EndorVPN.Core
             if (!_tunnelUp)
             {
                 timedOut = sw.ElapsedMilliseconds >= budget - 250;
+                // A silent TCP handshake leaves _lastLogLine empty, which used to
+                // log "server failed: X -> " with no reason at all.
+                if (string.IsNullOrWhiteSpace(_lastLogLine))
+                    _lastLogLine = timedOut ? "no answer on " + plan.Port + "/" + (plan.Tcp ? "tcp" : "udp")
+                                            : "connection closed by " + server.Host;
                 res.ErrorKey = classify(_lastLogLine, timedOut);
                 res.Detail = _lastLogLine;
                 StopProcess();

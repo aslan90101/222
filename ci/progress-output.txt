@@ -1,5 +1,6 @@
 distinct hint texts: 25
   Preparing network adapter… · click to cancel
+  Establishing tunnel… · us16.vpnbook.com · click to cancel
   Establishing tunnel… · us16.vpnbook.com · 14s · click to cancel
   Establishing tunnel… · us16.vpnbook.com · 13s · click to cancel
   Establishing tunnel… · us16.vpnbook.com · 12s · click to cancel
@@ -10,5 +11,4 @@ distinct hint texts: 25
   Establishing tunnel… · us16.vpnbook.com · 7s · click to cancel
   Establishing tunnel… · us16.vpnbook.com · 6s · click to cancel
   Establishing tunnel… · us16.vpnbook.com · 5s · click to cancel
-  Establishing tunnel… · us16.vpnbook.com · 4s · click to cancel
 ok=True

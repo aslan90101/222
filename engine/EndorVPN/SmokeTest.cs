@@ -65,10 +65,17 @@ namespace EndorVPN
             Check("config.decode", !string.IsNullOrEmpty(cfg) && cfg.Contains("remote "));
             string built = ConfigBuilder.Build(servers[0], cfg, new ConfigBuilder.Options { AdapterName = TapManager.AdapterName });
             Check("config.devnode", built.Contains("dev-node \"EndorVPN\""));
-            Check("config.gateway", built.Contains("redirect-gateway def1"));
+            // We must NOT emit redirect-gateway ourselves: both providers push it in
+            // PUSH_REPLY, and a local copy duplicates the option ("redirect-gateway
+            // and redirect-private at the same time") and installs the default route
+            // twice. The pushed copy is authoritative.
+            Check("config.gateway", !built.Contains("redirect-gateway"));
             Check("config.tap", built.Contains("tap-windows6"));
             Check("config.remote443", built.Contains("remote " ) && built.Contains(" 443"));
             Check("config.ca", built.Contains("<ca>"));
+            // throughput guards: large socket buffers and MTU-derived mssfix
+            Check("config.sndbuf", built.Contains("sndbuf 524288") && built.Contains("rcvbuf 524288"));
+            Check("config.mssfix", built.Contains("mssfix "));
 
             // ---- encrypted cache round trip ----
             var cache = new ServerCache(Path.Combine(paths.DataDir, "smoke.cache"), log);

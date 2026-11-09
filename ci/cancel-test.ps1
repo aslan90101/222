@@ -56,7 +56,7 @@ Invoke-ById "PowerButton" | Out-Null
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
 for ($i = 0; $i -lt 40; $i++) {
   Start-Sleep -Milliseconds 500
-  if ((Read-NewLog) -match "attempt \d+: ") { $result.sawAttempt = $true; break }
+  if ((Read-NewLog) -match "attempt \d+/\d+: ") { $result.sawAttempt = $true; break }
 }
 Write-Host "attempt started: $($result.sawAttempt) after $($sw.ElapsedMilliseconds) ms"
 
@@ -83,7 +83,7 @@ $reconnectable = $false
 for ($i = 0; $i -lt 20; $i++) {
   Start-Sleep -Milliseconds 500
   $delta = (Read-NewLog).Substring([Math]::Min($before.Length, (Read-NewLog).Length))
-  if ($delta -match "attempt \d+: ") { $reconnectable = $true; break }
+  if ($delta -match "attempt \d+/\d+: ") { $reconnectable = $true; break }
 }
 Write-Host "engine reusable after cancel: $reconnectable"
 if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force }

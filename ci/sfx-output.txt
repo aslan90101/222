@@ -1,12 +1,12 @@
 **********************
 PowerShell transcript start
-Start time: 20261109123323
+Start time: 20261109124850
 Username: runnervmm7ud1\runneradmin
 RunAs User: runnervmm7ud1\runneradmin
 Configuration Name: 
 Machine: runnervmm7ud1 (Microsoft Windows NT 10.0.26100.0)
-Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\fb54e791-57aa-45db-920b-05fea6512a80.ps1'
-Process ID: 6656
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -command . 'D:\a\_temp\130b12cc-1d76-41a8-ba98-0c4ac48c91f8.ps1'
+Process ID: 1392
 PSVersion: 7.6.9
 PSEdition: Core
 GitCommitId: 7.6.9
@@ -18,36 +18,36 @@ SerializationVersion: 1.1.0.1
 WSManStackVersion: 3.0
 **********************
   Determining projects to restore...
-  Restored D:\a\222\222\setup\Setup.csproj (in 92 ms).
+  Restored D:\a\222\222\setup\Setup.csproj (in 72 ms).
   Setup -> D:\a\222\222\setup\bin\x64\Release\net48\EndorVPN-Setup.exe
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:01.37
+Time Elapsed 00:00:01.01
 ---- stub build output ----
   Determining projects to restore...
-  Restored D:\a\222\222\setup\Setup.csproj (in 92 ms).
+  Restored D:\a\222\222\setup\Setup.csproj (in 72 ms).
   Setup -> D:\a\222\222\setup\bin\x64\Release\net48\EndorVPN-Setup.exe
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:01.37
-self-check: marker ok, zip ok, payload 5.78 MB
+Time Elapsed 00:00:01.01
+self-check: marker ok, zip ok, payload 7.05 MB
 stub   : 0.03 MB
-payload: 5.78 MB
-single : 5.82 MB -> D:\a\222\222\dist\EndorVPN.exe
-single exe: 5.82 MB
+payload: 7.05 MB
+single : 7.09 MB -> D:\a\222\222\dist\EndorVPN.exe
+single exe: 7.09 MB
 sfx unpack: exe=True engine=True
 
 Name          Length
 ----          ------
-EndorVPN.exe 6100397
+EndorVPN.exe 7429958
 
 **********************
 PowerShell transcript end
-End time: 20261109123328
+End time: 20261109124855
 **********************

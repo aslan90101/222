@@ -1,5 +1,6 @@
 {
-  "launched": true,
+  "distinctStages": 11,
+  "ok": true,
   "samples": [
     "Preparing network adapter… · click to cancel",
     "Preparing network adapter… · click to cancel",
@@ -13,12 +14,14 @@
     "Preparing network adapter… · click to cancel",
     "Preparing network adapter… · click to cancel",
     "Preparing network adapter… · click to cancel",
-    "Checking which servers answer… · 0/4 · click to cancel",
-    "Checking which servers answer… · 0/4 · click to cancel",
+    "Checking which servers answer… · 1/9 · click to cancel",
+    "Checking which servers answer… · 1/9 · click to cancel",
+    "Establishing tunnel… · vpn100383739 · click to cancel",
+    "Establishing tunnel… · vpn100383739 · 11s · click to cancel",
+    "Establishing tunnel… · vpn100383739 · 10s · click to cancel",
+    "Establishing tunnel… · us178.vpnbook.com · click to cancel",
     "Establishing tunnel… · us178.vpnbook.com · 11s · click to cancel",
     "Establishing tunnel… · us178.vpnbook.com · 10s · click to cancel",
-    "Establishing tunnel… · us178.vpnbook.com · 10s · click to cancel",
-    "Establishing tunnel… · us178.vpnbook.com · 9s · click to cancel",
     "Configuring routes… · click to cancel",
     "Configuring routes… · click to cancel",
     "Verifying new IP… · click to cancel",
@@ -30,12 +33,10 @@
     "Verifying new IP… · click to cancel",
     "Verifying new IP… · click to cancel",
     "Verifying new IP… · click to cancel",
-    "Click to disconnect",
-    "Click to disconnect",
-    "Click to disconnect",
-    "Click to disconnect",
-    "Click to disconnect",
-    "Click to disconnect",
+    "Verifying new IP… · click to cancel",
+    "Verifying new IP… · click to cancel",
+    "Verifying new IP… · click to cancel",
+    "Verifying new IP… · click to cancel",
     "Click to disconnect",
     "Click to disconnect",
     "Click to disconnect",
@@ -44,6 +45,5 @@
     "Click to disconnect",
     "Click to disconnect"
   ],
-  "distinctStages": 8,
-  "ok": true
+  "launched": true
 }

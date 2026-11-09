@@ -641,9 +641,20 @@ namespace EndorVPN
             // the richer VPN Gate list stays as the wide-coverage fallback.
             return c.Servers
                 .OrderBy(x => string.Equals(x.Provider, "vpnbook", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                // A profile that already speaks UDP is worth more than a fast-looking
+                // TCP node: TCP-in-TCP stalls on every loss and measured 0.1 Mbit/s.
+                .ThenBy(x => ProtoIsUdp(x) ? 0 : 1)
                 .ThenBy(x => x._measuredPing > 0 ? x._measuredPing : (x.Ping > 0 ? x.Ping : 8000))
-                .ThenByDescending(x => x.SpeedBps)
+                .ThenByDescending(x => Math.Min(x.SpeedBps, 100000000))
                 .ToList();
+        }
+
+        /// <summary>True when the profile's own config asks for UDP.</summary>
+        private static bool ProtoIsUdp(VpnServer s)
+        {
+            var cfg = ServerSource.DecodeConfig(s);
+            if (string.IsNullOrEmpty(cfg)) return false;
+            return cfg.IndexOf("proto udp", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private async Task VerifyIpAsync()

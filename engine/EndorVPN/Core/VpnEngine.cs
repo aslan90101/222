@@ -126,7 +126,10 @@ namespace EndorVPN.Core
                     {
                         if (candidates.Count >= PreflightPoolSize) break;
                         if (alt == null) continue;
-                        if (candidates.Any(c => c.Ip == alt.Ip)) continue;
+                        // Dedupe on Id, not Ip: the same VPNBook host publishes both a
+                        // tcp443 and a udp25000 profile, and dropping one by IP meant the
+                        // UDP profile - the fast one - never reached the preflight.
+                        if (candidates.Any(c => c.Id == alt.Id)) continue;
                         candidates.Add(alt);
                     }
                 }
@@ -272,15 +275,22 @@ namespace EndorVPN.Core
             // node can push 40 Mbit/s while a 150 ms one caps at 2. VPN Gate
             // publishes its own speed measurement, so rank on that first and use
             // latency only to break ties.
+            // Ranking, in order of what actually predicts usable speed:
+            //  1. UDP before TCP. Volunteer nodes are bandwidth-starved and TCP
+            //     retransmits turn any loss into a stall - this is the difference
+            //     between 0.1 Mbit/s and a usable tunnel, and it dominates the other
+            //     factors by an order of magnitude.
+            //  2. VPN Gate's SpeedBps field is the node's own loopback benchmark
+            //     ("970.8 Mbit/s advertised" on a home line). It measures the wrong
+            //     thing, so only trust it as a weak tie-break.
+            //  3. Latency last: it predicts responsiveness, not throughput.
             var alive = results.Where(r => r.ms >= 0)
-                               // VPNBook does not publish a speed figure; give it a
-                               // fair mid-rank so it is neither skipped nor always first.
-                               .OrderByDescending(r => r.srv.SpeedBps > 0 ? r.srv.SpeedBps : 5000000)
+                               .OrderBy(r => TransportOf(r.srv).Tcp ? 1 : 0)
+                               .ThenByDescending(r => Math.Min(r.srv.SpeedBps, 100000000))
                                .ThenBy(r => r.ms)
                                .ToList();
-            foreach (var r in alive.Take(3))
-                _log.Info("rank: " + r.srv.Host + " " + r.ms + " ms, " +
-                          (r.srv.SpeedBps / 1000000.0).ToString("0.0") + " Mbit/s advertised");
+            foreach (var r in alive.Take(4))
+                _log.Info("rank: " + r.srv.Host + " " + r.ms + " ms via " + TransportOf(r.srv));
             _log.Info("preflight: " + alive.Count + "/" + results.Length + " candidates answered");
             if (alive.Count == 0)
             {
@@ -332,18 +342,29 @@ namespace EndorVPN.Core
                 return (-1, false);
             }
 
-            // profile says tcp: check whether the node also serves udp
-            int udp = await ProbeUdpAsync(host, 1194, ProbeTimeoutMs, ct).ConfigureAwait(false);
-            if (udp >= 0)
+            // TCP profile: does the node also serve UDP? Ask the profile's own port
+            // first, then the two conventional ones. A node listening on a custom
+            // TCP port (1562, 1779...) usually answers UDP on the same number.
+            foreach (int udpPort in new[] { basePlan.Port, 1194, 25000 })
             {
-                var udpPlan = new TransportPlan { Tcp = false, Port = 1194 };
+                int udp = await ProbeUdpAsync(host, udpPort, ProbeTimeoutMs, ct).ConfigureAwait(false);
+                if (udp < 0) continue;
+                var udpPlan = new TransportPlan { Tcp = false, Port = udpPort };
                 lock (_plans) _plans[srv.Id] = udpPlan;
                 return (udp, true);
             }
-
             int tcp = await ProbeTcpAsync(host, basePlan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
             if (tcp >= 0) lock (_plans) _plans[srv.Id] = basePlan;
             return (tcp, true);
+        }
+
+        /// <summary>The transport the preflight settled on, falling back to a fresh guess.</summary>
+        private TransportPlan TransportOf(VpnServer srv)
+        {
+            TransportPlan plan = null;
+            lock (_plans) _plans.TryGetValue(srv.Id, out plan);
+            if (plan != null) return plan;
+            return PickTransport(srv, ServerSource.DecodeConfig(srv), null);
         }
 
         private const int ProbeTimeoutMs = 1200;

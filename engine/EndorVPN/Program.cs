@@ -15,7 +15,7 @@ namespace EndorVPN
     public static class Program
     {
         public const string AppName = "EndorVPN";
-        public const string Version = "1.1.8";
+        public const string Version = "1.1.9";
 
         public static Paths Paths { get; private set; }
         public static AppSettings Settings { get; private set; }

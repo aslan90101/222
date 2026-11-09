@@ -32,7 +32,30 @@ namespace EndorVPN.Core
         [System.Xml.Serialization.XmlIgnore]
         public int _measuredPing { get; set; }
 
-        public string Id => (CountryCode ?? "??") + "|" + (Host ?? "") + "|" + (Ip ?? "");
+        /// <summary>
+        /// Identity for dedupe and transport bookkeeping. The protocol is part of it:
+        /// VPNBook serves the same host over tcp443 and udp25000, and without this
+        /// the two profiles collided, so the UDP one silently replaced the TCP one
+        /// (or the other way round) and only TCP was ever dialled.
+        /// </summary>
+        public string Id => (CountryCode ?? "??") + "|" + (Host ?? "") + "|" + (Ip ?? "") + "|" + ProtoTag;
+
+        /// <summary>"udp"/"tcp" from the profile, empty when unknown.</summary>
+        public string ProtoTag
+        {
+            get
+            {
+                try
+                {
+                    var cfg = ServerSource.DecodeConfig(this);
+                    if (string.IsNullOrEmpty(cfg)) return "";
+                    if (cfg.IndexOf("proto udp", StringComparison.OrdinalIgnoreCase) >= 0) return "udp";
+                    if (cfg.IndexOf("proto tcp", StringComparison.OrdinalIgnoreCase) >= 0) return "tcp";
+                }
+                catch { }
+                return "";
+            }
+        }
 
         /// <summary>Country name fallback for locales without a translation.</summary>
         public string CountryName => string.IsNullOrWhiteSpace(Country) ? (CountryCode ?? "?") : Country;

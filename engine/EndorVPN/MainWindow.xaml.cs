@@ -44,6 +44,8 @@ namespace EndorVPN
         private string _stage = "";
         private System.Windows.Forms.NotifyIcon _tray;
         private bool _realIpLoaded;
+
+        private bool _ipSameWarned;
         private bool _stageLive;
         private string _autoLastCountry;
 
@@ -387,6 +389,7 @@ namespace EndorVPN
             if (state == VpnEngine.State.Connected)
             {
                 _connectedAt = DateTime.Now;
+                _ipSameWarned = false;
                 _netStats.Reset();
                 var srv = _engine.ActiveServer;
                 var ip = _engine.ActiveIp;
@@ -659,17 +662,45 @@ namespace EndorVPN
 
         private async Task VerifyIpAsync()
         {
+            // Providers can answer from a pre-tunnel cache for a moment; a couple of
+            // spaced retries are what actually produce the tunnel address.
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                if (await VerifyIpOnceAsync()) return;
+                try { await Task.Delay(1500); } catch { return; }
+            }
+        }
+
+        /// <summary>One verification round. True when a trustworthy tunnel IP was shown.</summary>
+        private async Task<bool> VerifyIpOnceAsync()
+        {
             try
             {
                 var info = await _ipChecker.GetAsync(CancellationToken.None);
-                if (info != null && info.Ok)
+                if (info == null || !info.Ok) return false;
+
+                // The address shown must describe the tunnel, and it must not lie.
+                // Right after connecting, providers can still answer with the
+                // pre-tunnel address (connection reuse, DNS answer cached from
+                // before the route flipped). Printing that over the connected view
+                // made a working tunnel look broken - the log showed the user's own
+                // ISP address next to "tunnel up".
+                if (_realIp != null && _realIp.Ok && info.Ip == _realIp.Ip)
                 {
-                    VpnIpText.Text = info.Ip;
-                    if (_realIp != null && _realIp.Ok && info.Ip == _realIp.Ip)
+                    if (_state == VpnEngine.State.Connected)
+                        VpnIpText.Text = "…";   // not verified yet, do not show a stale value
+                    // warn once per connection, not once per retry
+                    if (!_ipSameWarned)
+                    {
+                        _ipSameWarned = true;
                         Toast(Loc.T("toast.ipsame"), ToastKind.Warn);
+                    }
+                    return false;
                 }
+                VpnIpText.Text = info.Ip;
+                return true;
             }
-            catch { }
+            catch { return false; }
         }
 
         // ===================================================================

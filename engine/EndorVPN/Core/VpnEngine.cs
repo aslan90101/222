@@ -342,18 +342,29 @@ namespace EndorVPN.Core
                 return (-1, false);
             }
 
-            // TCP profile: does the node also serve UDP? Ask the profile's own port
-            // first, then the two conventional ones. A node listening on a custom
-            // TCP port (1562, 1779...) usually answers UDP on the same number.
-            foreach (int udpPort in new[] { basePlan.Port, 1194, 25000 })
+            // TCP profile: does the node also serve UDP, and on which port?
+            //
+            // Probe everything at once. Doing the three UDP ports sequentially cost
+            // up to 3.6 s per node, and with only 8 slots the whole preflight grew to
+            // 11 s - long enough to look hung. Parallel probing keeps it at ~1.2 s.
+            int[] udpPorts = basePlan.Port == 1194 ? new[] { 1194, 25000 } : new[] { basePlan.Port, 1194, 25000 };
+            var udpTasks = udpPorts.Select(p => ProbeUdpAsync(host, p, ProbeTimeoutMs, ct)).ToList();
+            udpTasks.Add(ProbeTcpAsync(host, basePlan.Port, ProbeTimeoutMs, ct));
+            int[] results;
+            try { results = await Task.WhenAll(udpTasks).ConfigureAwait(false); }
+            catch { return (-1, false); }
+
+            // Prefer UDP even when TCP answered: TCP-in-TCP is what throttled the
+            // tunnel to 0.1 Mbit/s, so a working UDP path always wins.
+            for (int i = 0; i < udpPorts.Length; i++)
             {
-                int udp = await ProbeUdpAsync(host, udpPort, ProbeTimeoutMs, ct).ConfigureAwait(false);
-                if (udp < 0) continue;
-                var udpPlan = new TransportPlan { Tcp = false, Port = udpPort };
+                if (results[i] < 0) continue;
+                var udpPlan = new TransportPlan { Tcp = false, Port = udpPorts[i] };
                 lock (_plans) _plans[srv.Id] = udpPlan;
-                return (udp, true);
+                return (results[i], true);
             }
-            int tcp = await ProbeTcpAsync(host, basePlan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
+
+            int tcp = results[results.Length - 1];
             if (tcp >= 0) lock (_plans) _plans[srv.Id] = basePlan;
             return (tcp, true);
         }
@@ -627,19 +638,22 @@ namespace EndorVPN.Core
             }
 
             Stage(Loc.T("stage.routes"));
-            await Task.Delay(900, ct).ConfigureAwait(false);
+            // With UDP the default route settles a little later than with TCP; give
+            // the stack time before asking anyone who we are, otherwise every
+            // provider fails and the UI is left showing the pre-connect address.
+            await Task.Delay(1500, ct).ConfigureAwait(false);
             Stage(Loc.T("stage.verify"));
 
             var checker = new IpChecker(_log);
             IpInfo info = null;
             using (var verifyCts = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                verifyCts.CancelAfter(TimeSpan.FromSeconds(8));
-                for (int i = 0; i < 2; i++)
+                verifyCts.CancelAfter(TimeSpan.FromSeconds(12));
+                for (int i = 0; i < 4; i++)
                 {
                     try { info = await checker.GetAsync(verifyCts.Token).ConfigureAwait(false); } catch { }
                     if (info != null && info.Ok) break;
-                    try { await Task.Delay(500, verifyCts.Token).ConfigureAwait(false); } catch { break; }
+                    try { await Task.Delay(800, verifyCts.Token).ConfigureAwait(false); } catch { break; }
                 }
             }
 

@@ -96,7 +96,11 @@ namespace EndorVPN.Core
             outLines.Add("verb 3");
             outLines.Add("remote-cert-tls server");
             outLines.Add("auth-nocache");
-            outLines.Add("route-delay 1");
+            // Give Windows a moment to settle the interface before the pushed
+            // routes go in. With route-delay 1 the first UDP keepalive occasionally
+            // hit "write UDPv4: No Route to Host (WSAEHOSTUNREACH)" because openvpn
+            // transmitted before the default route existed.
+            outLines.Add("route-delay 2");
             // TAP-Windows6 emulates a DHCP server and leaves the interface down
             // until Windows accepts the lease. When the DHCP Client service is
             // disabled/slow the adapter never comes up and OpenVPN spins forever on
@@ -187,12 +191,14 @@ namespace EndorVPN.Core
             // Windows builds those filters also swallow the DHCP lease renewal that
             // brings the TAP interface up, which is the one thing we cannot afford.
             if (!opts.NoDnsBlock) outLines.Add("block-outside-dns");
-            // redirect-gateway is pushed by both providers. Adding our own makes
-            // openvpn warn "redirect-gateway and redirect-private at the same time"
-            // and can install the default route twice. Only add it when the profile
-            // does not already carry it (VPNBook profiles do).
-            if (!head.Any(l => l.StartsWith("redirect-gateway", StringComparison.OrdinalIgnoreCase)))
-                outLines.Add("redirect-gateway def1");
+            // Never add redirect-gateway ourselves.
+            //
+            // Both providers push it in PUSH_REPLY, and that push happens no matter
+            // what the profile file says - so "add it only if the profile lacks it"
+            // still produced a duplicate, along with openvpn's warning
+            // "You have specified redirect-gateway and redirect-private at the same
+            // time" and a second default-route install on every connect.
+            // The pushed copy is authoritative and arrives within the handshake.
 
             var sb = new StringBuilder();
             foreach (var l in outLines) sb.AppendLine(l);

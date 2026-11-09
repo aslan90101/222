@@ -111,7 +111,10 @@ namespace EndorVPN.Core
                     Operator = f[12].Trim(),
                     ConfigBase64 = b64.Trim(),
                 };
-                if (s.CountryCode.Length != 2) continue;
+                // Keep nodes whose country we cannot map: dropping them silently
+                // shrank the list for no reason. They show up under an "unknown"
+                // grouping instead.
+                if (string.IsNullOrEmpty(s.CountryCode)) s.CountryCode = "??";
                 list.Add(s);
             }
             log.Info("parsed " + list.Count + " servers");
@@ -165,15 +168,26 @@ namespace EndorVPN.Core
                     }
                 }, ct));
             }
+            // Merge every source instead of taking the first one that answers.
+            //
+            // The mirror and vpngate.net publish different snapshots of the
+            // volunteer pool: whichever replied first used to win outright, so the
+            // country list depended on network timing and often showed only the
+            // 12 countries present in the fastest mirror. Union them by Id.
+            var merged = new List<VpnServer>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             while (tasks.Count > 0)
             {
                 var finished = await Task.WhenAny(tasks).ConfigureAwait(false);
                 tasks.Remove(finished);
                 var list = finished.Result;
-                if (list != null && list.Count > 0) return list;
+                if (list == null) continue;
+                foreach (var s in list)
+                    if (seen.Add(s.Id)) merged.Add(s);
             }
-            log.Error("all server sources failed");
-            return new List<VpnServer>();
+            log.Info("merged server list: " + merged.Count + " servers from " + urls.Count + " sources");
+            if (merged.Count == 0) log.Error("all server sources failed");
+            return merged;
         }
 
         public static string DecodeConfig(VpnServer server)

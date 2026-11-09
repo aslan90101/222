@@ -76,6 +76,11 @@ namespace EndorVPN
             // throughput guards: large socket buffers and MTU-derived mssfix
             Check("config.sndbuf", built.Contains("sndbuf 524288") && built.Contains("rcvbuf 524288"));
             Check("config.mssfix", built.Contains("mssfix "));
+            // Country comes from the subdomain prefix so newly published VPNBook
+            // gateways work without a release (us16 -> US, de220 -> DE, sg1 -> SG).
+            Check("vpnbook.country", VpnBookSource.CountryForTest("us16.vpnbook.com") == "US"
+                                  && VpnBookSource.CountryForTest("sg1.vpnbook.com") == "SG"
+                                  && VpnBookSource.CountryForTest("uk205.vpnbook.com") == "GB");
 
             // ---- encrypted cache round trip ----
             var cache = new ServerCache(Path.Combine(paths.DataDir, "smoke.cache"), log);

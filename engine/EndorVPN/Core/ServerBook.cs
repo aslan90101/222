@@ -197,7 +197,9 @@ namespace EndorVPN.Core
                     all = favoritesList;
                     break;
                 case "fast":
-                    all = all.OrderBy(c => c.BestPing <= 0 ? int.MaxValue : c.BestPing).Take(15);
+                    // No arbitrary cut-off: "fast" should mean "sorted by latency",
+                    // not "only the first 15 countries exist".
+                    all = all.OrderBy(c => c.BestPing <= 0 ? int.MaxValue : c.BestPing);
                     break;
             }
             if (!string.IsNullOrWhiteSpace(query))

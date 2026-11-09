@@ -83,7 +83,13 @@ namespace EndorVPN.Core
         public int MaxAttempts = 5;
 
         /// <summary>How many ranked servers enter the preflight (cheap, parallel).</summary>
-        public int PreflightPoolSize = 20;
+        /// <summary>
+        /// How many ranked servers enter the preflight. Probing is parallel and
+        /// capped at ~1.2 s per node, so a wider pool costs almost nothing and gives
+        /// many more chances to find a fast node - the old value of 20 left most of
+        /// a 99-server feed untried.
+        /// </summary>
+        public int PreflightPoolSize = 40;
 
         /// <summary>Set by the log pump when the peer rejects our credentials.</summary>
         private volatile bool _authRejected;

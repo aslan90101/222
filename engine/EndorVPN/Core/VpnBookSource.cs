@@ -77,13 +77,31 @@ namespace EndorVPN.Core
                 }
                 log.Info("vpnbook credentials parsed");
 
-                // only touch hosts that are actually listed on the page
+                // Discover the hosts from the page itself, not from a fixed table.
+                //
+                // The old build only looked for ten hard-coded names, so a country
+                // VPNBook had just added was invisible until someone shipped a new
+                // release. The page lists every live gateway as <host>.vpnbook.com
+                // (us16, de220, sg1, jp2 ...), so read them all and map the country
+                // from the subdomain prefix; unknowns fall back to the table.
                 var hosts = new List<string>();
-                foreach (var kv in HostToCountry)
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (System.Text.RegularExpressions.Match m in
+                         System.Text.RegularExpressions.Regex.Matches(page, @"\b([a-z]{2}\d{1,4})\.vpnbook\.com\b",
+                             System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                 {
-                    if (page.IndexOf(kv.Key, StringComparison.OrdinalIgnoreCase) >= 0) hosts.Add(kv.Key);
+                    string host = m.Groups[1].Value.ToLowerInvariant() + ".vpnbook.com";
+                    if (seen.Add(host)) hosts.Add(host);
+                }
+                if (hosts.Count == 0)
+                {
+                    // page layout changed - keep the known set as a safety net
+                    foreach (var kv in HostToCountry)
+                        if (page.IndexOf(kv.Key, StringComparison.OrdinalIgnoreCase) >= 0) hosts.Add(kv.Key);
                 }
                 if (hosts.Count == 0) hosts.AddRange(HostToCountry.Keys);
+                log.Info("vpnbook hosts found: " + hosts.Count + " (" + string.Join(", ", hosts.Take(8)) +
+                         (hosts.Count > 8 ? ", ..." : "") + ")");
 
                 var gate = new SemaphoreSlim(4);
                 var tasks = new List<Task>();
@@ -103,12 +121,13 @@ namespace EndorVPN.Core
                                 string cfg = await client.GetStringAsync(string.Format(ConfigUrl, h, p)).ConfigureAwait(false);
                                 if (cfg == null || cfg.Length < 300 || cfg.IndexOf("<ca>", StringComparison.OrdinalIgnoreCase) < 0)
                                     return;
+                                string cc = CountryOf(h);
                                 var srv = new VpnServer
                                 {
                                     Host = h,
                                     Ip = h,
-                                    CountryCode = HostToCountry[h],
-                                    Country = CountryNames[HostToCountry[h]],
+                                    CountryCode = cc,
+                                    Country = CountryNames.ContainsKey(cc) ? CountryNames[cc] : cc,
                                     ConfigBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cfg)),
                                     Provider = "vpnbook",
                                     AuthUser = bundle.User,
@@ -137,6 +156,31 @@ namespace EndorVPN.Core
             }
             return bundle;
         }
+
+        /// <summary>
+        /// Country for a gateway from its subdomain prefix (us16 -> US, de220 -> DE,
+        /// jp2 -> JP). Unknown two-letter prefixes are still usable, so we return
+        /// them uppercased rather than dropping the server.
+        /// </summary>
+        private static string CountryOf(string host)
+        {
+            string known;
+            if (HostToCountry.TryGetValue(host, out known) && !string.IsNullOrEmpty(known)) return known;
+
+            var m = System.Text.RegularExpressions.Regex.Match(host ?? "", @"^([a-z]{2})\d");
+            if (m.Success)
+            {
+                string cc = m.Groups[1].Value.ToUpperInvariant();
+                // ISO 3166 uses GB for the United Kingdom; the subdomain says "uk".
+                // Flags and translations are keyed by the ISO code, so map it here.
+                if (cc == "UK") cc = "GB";
+                return cc;
+            }
+            return "??";
+        }
+
+        /// <summary>Exposed for the smoke test: country mapping must not need a table entry.</summary>
+        internal static string CountryForTest(string host) { return CountryOf(host); }
 
         private static string MatchCredentials(string page, string label)
         {

@@ -70,9 +70,9 @@ namespace EndorVpnSetup
             try
             {
                 var v = Assembly.GetExecutingAssembly().GetName().Version;
-                return v == null ? "1.1.10" : v.ToString();
+                return v == null ? "1.2.0" : v.ToString();
             }
-            catch { return "1.1.10"; }
+            catch { return "1.2.0"; }
         }
 
         private static bool IsInstalled(string dir, string markerFile)

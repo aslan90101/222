@@ -186,7 +186,7 @@ namespace EndorVPN.Core
                 foreach (var s in list)
                     if (seen.Add(s.Id)) merged.Add(s);
             }
-            log.Info("merged server list: " + merged.Count + " servers from " + urls.Count + " sources");
+            log.Info("merged server list: " + merged.Count + " servers from " + urls.Length + " sources");
             if (merged.Count == 0) log.Error("all server sources failed");
             return merged;
         }

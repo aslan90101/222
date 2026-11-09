@@ -1,8 +1,7 @@
-distinct hint texts: 7
+distinct hint texts: 6
   Preparing network adapter… · click to cancel
-  Checking which servers answer… · 2/4 · click to cancel
-  Establishing tunnel… · us178.vpnbook.com · 11s · click to cancel
-  Establishing tunnel… · us178.vpnbook.com · 10s · click to cancel
+  Establishing tunnel… · us16.vpnbook.com · 11s · click to cancel
+  Establishing tunnel… · us16.vpnbook.com · 10s · click to cancel
   Configuring routes… · click to cancel
   Verifying new IP… · click to cancel
   Click to disconnect

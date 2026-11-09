@@ -107,7 +107,18 @@ namespace EndorVPN.Core
             // "Route: Waiting for TUN/TAP interface to come up". netsh sets the
             // address directly, no lease involved.
             outLines.Add("ip-win32 netsh");
-            outLines.Add("connect-retry-max 1");
+            // A single failed attempt used to be fatal: openvpn exited on the very
+            // first hiccup (server poll timeout, one dropped packet during the
+            // handshake) and the tunnel simply disappeared. Keep retrying on the
+            // same server instead of handing the failure to the user.
+            outLines.Add("connect-retry-max 12");
+            outLines.Add("connect-retry 2");
+            // Recover from a dead peer rather than exiting: the server sends
+            // "ping 3, ping-restart 10", so ten silent seconds is normal on a
+            // congested volunteer node and must not tear the tunnel down.
+            outLines.Add("ping 10");
+            outLines.Add("ping-restart 120");
+
             outLines.Add("connect-timeout " + Math.Max(8, opts.ConnectTimeoutSec));
             outLines.Add("tun-mtu " + opts.TunMtu);
             outLines.Add("mssfix " + Math.Max(1200, opts.TunMtu - 70));

@@ -41,6 +41,8 @@ namespace EndorVPN.Core
         private readonly object _sync = new object();
 
         private Process _proc;
+
+        private CancellationTokenSource _watchCts;
         private CancellationTokenSource _cts;
         private volatile string _lastLogLine = "";
 
@@ -60,6 +62,13 @@ namespace EndorVPN.Core
         public event Action<State> StateChanged;
         public event Action<string> StageChanged;
         public event Action<string> LogLine;
+
+        /// <summary>
+        /// Raised when an established tunnel dies without the user asking for it.
+        /// The UI needs this: before, openvpn could exit ten minutes after
+        /// connecting and the window kept showing "Connected" with a dead tunnel.
+        /// </summary>
+        public event Action<string> TunnelLost;
 
         public VpnEngine(Paths paths, Log log, KillSwitch killSwitch)
         {
@@ -375,6 +384,52 @@ namespace EndorVPN.Core
             return (tcp, true);
         }
 
+        /// <summary>
+        /// Watches the tunnel after it is up.
+        ///
+        /// Two things killed connections from the user's side and were invisible
+        /// before: openvpn exiting on its own (a single dropped packet during the
+        /// handshake was fatal with connect-retry-max 1), and the process being
+        /// alive while the data channel is gone. Both now surface as TunnelLost.
+        /// </summary>
+        private void StartWatchdog()
+        {
+            var proc = _proc;
+            if (proc == null) return;
+
+            // drop any previous watcher
+            try { _watchCts?.Cancel(); } catch { }
+            _watchCts = new CancellationTokenSource();
+            var token = _watchCts.Token;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    while (!token.IsCancellationRequested)
+                    {
+                        await Task.Delay(1500, token).ConfigureAwait(false);
+                        if (_proc != proc) return;            // replaced or stopped by us
+                        if (proc.HasExited)
+                        {
+                            _log.Warn("tunnel dropped: openvpn exited with " + proc.ExitCode);
+                            RaiseTunnelLost("openvpn exited");
+                            return;
+                        }
+                    }
+                }
+                catch (OperationCanceledException) { }
+                catch (Exception ex) { _log.Warn("watchdog: " + ex.Message); }
+            }, token);
+        }
+
+        private void RaiseTunnelLost(string reason)
+        {
+            try { _watchCts?.Cancel(); } catch { }
+            var h = TunnelLost;
+            if (h != null) h(reason);
+        }
+
         /// <summary>The transport the preflight settled on, falling back to a fresh guess.</summary>
         private TransportPlan TransportOf(VpnServer srv)
         {
@@ -666,6 +721,7 @@ namespace EndorVPN.Core
             res.Ok = true;
             res.Ip = info ?? new IpInfo();
             _log.Info("tunnel up via " + server.Host + ", exit ip " + (info == null ? "?" : info.Ip));
+            StartWatchdog();
             return res;
         }
 
@@ -747,6 +803,9 @@ namespace EndorVPN.Core
 
         private void StopProcess()
         {
+            // Cancel the watcher first: a deliberate disconnect must never look
+            // like a dropped tunnel and trigger a reconnect loop.
+            try { _watchCts?.Cancel(); } catch { }
             try
             {
                 if (_proc != null && !_proc.HasExited)

@@ -46,6 +46,8 @@ namespace EndorVPN
         private bool _realIpLoaded;
 
         private bool _ipSameWarned;
+
+        private bool _recovering;
         private bool _stageLive;
         private string _autoLastCountry;
 
@@ -65,6 +67,7 @@ namespace EndorVPN
 
             _engine.StateChanged += s => Dispatcher.BeginInvoke((Action)(() => OnEngineState(s)));
             _engine.StageChanged += t => Dispatcher.BeginInvoke((Action)(() => { _stage = t; RefreshHero(); }));
+            _engine.TunnelLost += reason => Dispatcher.BeginInvoke((Action)(() => OnTunnelLost(reason)));
             _engine.LogLine += line => Dispatcher.BeginInvoke((Action)(() => AppendLog(line)));
 
             Loc.Changed += () =>
@@ -618,6 +621,38 @@ namespace EndorVPN
                 if (_state == VpnEngine.State.Connecting) SetState(VpnEngine.State.Idle);
                 UpdateServerBadge();
             }
+        }
+
+        /// <summary>
+        /// The tunnel died after being established. Tell the user and try to
+        /// re-establish on the same country once, because a volunteer node
+        /// restarting its service is common and usually recovers.
+        /// </summary>
+        private async void OnTunnelLost(string reason)
+        {
+            if (_state != VpnEngine.State.Connected) return;
+            // the watchdog may fire twice while the process is being torn down
+            if (_recovering) return;
+            _recovering = true;
+            Program.Log.Warn("tunnel lost (" + reason + ") - reconnecting");
+
+            SetState(VpnEngine.State.Idle);
+            Toast(Loc.T("toast.dropped"), ToastKind.Warn);
+
+            try { _engine.Disconnect(); } catch { }
+
+            string country = _settings.SelectedCountry;
+            if (string.IsNullOrEmpty(country)) return;
+
+            await Task.Delay(1200);
+            if (_state != VpnEngine.State.Idle || _busy) return;
+
+            var srv = PickForCountry(country);
+            try
+            {
+                if (srv != null) await ConnectAsync(srv, country);
+            }
+            finally { _recovering = false; }
         }
 
         private void StageText(string text)

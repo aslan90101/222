@@ -8,11 +8,11 @@
     <AssemblyName>EndorVPN</AssemblyName>
     <RootNamespace>EndorVPN</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>1.1.4</Version>
+    <Version>1.1.5</Version>
     <Company>EndorVPN</Company>
     <Product>EndorVPN</Product>
-    <FileVersion>1.1.4.0</FileVersion>
-    <AssemblyVersion>1.1.4.0</AssemblyVersion>
+    <FileVersion>1.1.5.0</FileVersion>
+    <AssemblyVersion>1.1.5.0</AssemblyVersion>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <PlatformTarget>x64</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>

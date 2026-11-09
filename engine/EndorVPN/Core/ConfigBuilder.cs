@@ -106,8 +106,13 @@ namespace EndorVPN.Core
             else
             {
                 outLines.Add("remote " + remoteHost + " 443");
-                outLines.Add("remote " + remoteHost + " 1194");
-                if (remoteIsDomain) outLines.Add("remote-random");
+                if (remoteIsDomain)
+                {
+                    // remote-random shuffles the remote *list*, and with two ports
+                    // listed it was silently picking 1194 half the time - a port the
+                    // profile never advertised. Keep the profile's own port only.
+                    outLines.Add("remote " + remoteHost + " " + remotePort);
+                }
             }
 
             if (!string.IsNullOrEmpty(opts.AuthFile))

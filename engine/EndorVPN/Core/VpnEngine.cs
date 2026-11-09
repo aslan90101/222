@@ -77,9 +77,6 @@ namespace EndorVPN.Core
         /// <summary>How many ranked servers enter the preflight (cheap, parallel).</summary>
         public int PreflightPoolSize = 20;
 
-        /// <summary>Set by the preflight: did any candidate answer on TCP?</summary>
-        private bool _preflightFoundTcp = true;
-
         /// <summary>Set by the log pump when the peer rejects our credentials.</summary>
         private volatile bool _authRejected;
 
@@ -203,13 +200,20 @@ namespace EndorVPN.Core
         }
 
         /// <summary>
-        /// Measures a whole candidate list in parallel before any tunnel is started.
+        /// Cheap reachability check on the real endpoint, run before starting a tunnel.
         ///
-        /// The reported dead end was exactly this: three KR nodes, each burning a
-        /// full 15 s attempt on "Attempting to establish TCP connection", ending in
-        /// "not connected" after ~45 s of nothing. A TCP connect either completes
-        /// in a few hundred ms or the port is filtered - probing all 20 candidates
-        /// concurrently costs ~1.2 s total and tells us who is worth trying.
+        /// History of this method matters, because two earlier versions were wrong:
+        ///  - probing by Host name failed instantly for every node: VPN Gate labels
+        ///    its nodes "vpn193342579" / "public-vpn-94", which do not resolve in DNS.
+        ///    The old code then declared all 20 candidates dead in 14 ms and fell
+        ///    straight through to UDP against nodes that were never checked.
+        ///  - probing only TCP disqualified nodes that serve UDP only.
+        ///
+        /// The real remote lives in the profile (field Ip is the endpoint), so that
+        /// is what we test: TCP on the profile's own port when the profile says tcp,
+        /// otherwise a UDP handshake packet with a reply wait. Only nodes that do
+        /// not answer at all are dropped, and the list survives intact if the
+        /// measurement itself proves unreliable.
         /// </summary>
         private async Task<List<VpnServer>> PreflightAsync(List<VpnServer> candidates, AppSettings settings, CancellationToken ct)
         {
@@ -228,13 +232,8 @@ namespace EndorVPN.Core
                     await gate.WaitAsync(ct).ConfigureAwait(false);
                     try
                     {
-                        int best = int.MaxValue;
-                        foreach (int port in ProbePorts)
-                        {
-                            int ms = await ProbeTcpAsync(s.Host, port, ProbeTimeoutMs, ct).ConfigureAwait(false);
-                            if (ms >= 0 && ms < best) best = ms;
-                        }
-                        return (s, best == int.MaxValue ? -1 : best);
+                        int ms = await ProbeServerAsync(s, settings, ct).ConfigureAwait(false);
+                        return (s, ms);
                     }
                     finally
                     {
@@ -249,26 +248,95 @@ namespace EndorVPN.Core
             try { results = await Task.WhenAll(tasks).ConfigureAwait(false); }
             catch { return candidates; }
 
-            var alive = results.Where(r => r.ms >= 0).OrderBy(r => r.ms).ToList();
             foreach (var r in results)
-                _log.Info("probe: " + r.srv.Host + " " + (r.ms >= 0 ? r.ms + " ms" : "unreachable"));
-            _log.Info("preflight: " + alive.Count + "/" + results.Length + " candidates answered");
+                _log.Info("probe: " + r.srv.Host + " [" + EndpointOf(r.srv) + "] " +
+                          (r.ms >= 0 ? r.ms + " ms" : "no reply"));
 
-            _preflightFoundTcp = alive.Count > 0;
+            var alive = results.Where(r => r.ms >= 0).OrderBy(r => r.ms).ToList();
+            _log.Info("preflight: " + alive.Count + "/" + results.Length + " candidates answered");
             if (alive.Count == 0)
             {
-                // No TCP answer anywhere. That can mean the whole range is dead,
-                // or that this network filters TCP while UDP still flows - which
-                // is common for VPN traffic. Fall back to the best-ranked nodes
-                // over UDP rather than declaring the network hopeless.
-                _log.Warn("preflight: no TCP answer, falling back to UDP on top-ranked nodes");
+                _log.Warn("preflight: nothing answered, trying top-ranked nodes anyway");
                 return candidates.Take(MaxAttempts).ToList();
             }
             return alive.Select(r => r.srv).ToList();
         }
 
+        private static string EndpointOf(VpnServer srv)
+        {
+            if (!string.IsNullOrEmpty(srv.Ip) && srv.Ip != srv.Host) return srv.Ip;
+            var cfg = ServerSource.DecodeConfig(srv);
+            if (!string.IsNullOrEmpty(cfg))
+            {
+                foreach (var line in cfg.Split('\n'))
+                {
+                    var l = line.Trim();
+                    if (l.StartsWith("remote ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var parts = l.Split(' ');
+                        if (parts.Length >= 2) return parts[1];
+                    }
+                }
+            }
+            return srv.Host;
+        }
+
+        /// <summary>TCP connect for tcp profiles, UDP handshake probe for udp ones.</summary>
+        private static async Task<int> ProbeServerAsync(VpnServer srv, AppSettings settings, CancellationToken ct)
+        {
+            var cfgText = ServerSource.DecodeConfig(srv);
+            var plan = PickTransport(srv, cfgText, settings);
+            string host = EndpointOf(srv);
+            if (string.IsNullOrEmpty(host)) return -1;
+
+            if (plan.Tcp)
+                return await ProbeTcpAsync(host, plan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
+            return await ProbeUdpAsync(host, plan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
+        }
+
         private const int ProbeTimeoutMs = 1200;
-        private static readonly int[] ProbePorts = { 443, 1194, 25000 };
+
+        /// <summary>
+        /// UDP has no connect handshake, so a silent port is indistinguishable from
+        /// a dead one. OpenVPN answers a P_CONTROL_HARD_RESET as soon as it sees it,
+        /// so sending one and waiting for any reply tells us the node is alive.
+        /// No reply is not proof of death (some servers rate-limit resets), which is
+        /// why the caller falls back to the ranking instead of trusting an empty set.
+        /// </summary>
+        private static async Task<int> ProbeUdpAsync(string host, int port, int timeoutMs, CancellationToken ct)
+        {
+            try
+            {
+                var addrs = await System.Net.Dns.GetHostAddressesAsync(host).ConfigureAwait(false);
+                var addr = addrs.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork) ?? addrs.FirstOrDefault();
+                if (addr == null) return -1;
+                if (addr.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork) return -1;
+
+                using (var udp = new System.Net.Sockets.UdpClient(0))
+                {
+                    udp.Client.ReceiveTimeout = timeoutMs;
+                    // P_CONTROL_HARD_RESET_CLIENT_V2: opcode 7 << 3, 8 byte session id,
+                    // no packet id, no message packet id, zero-length payload.
+                    var packet = new byte[8 + 1 + 8];
+                    packet[0] = 0x38;
+                    for (int i = 0; i < 8; i++) packet[1 + i] = (byte)(i * 7 + 1);
+                    packet[9] = 0x00; // message packet id array length
+
+                    var ep = new System.Net.IPEndPoint(addr, port);
+                    var sw = Stopwatch.StartNew();
+                    await udp.SendAsync(packet, packet.Length, ep).ConfigureAwait(false);
+
+                    var receive = udp.ReceiveAsync();
+                    var done = await Task.WhenAny(receive, Task.Delay(timeoutMs, ct)).ConfigureAwait(false);
+                    if (done != receive) return -1;
+                    var result = await receive.ConfigureAwait(false);
+                    if (result == null || result.Buffer == null || result.Buffer.Length == 0) return -1;
+                    sw.Stop();
+                    return (int)sw.ElapsedMilliseconds;
+                }
+            }
+            catch { return -1; }
+        }
 
         private static async Task<int> ProbeTcpAsync(string host, int port, int timeoutMs, CancellationToken ct)
         {
@@ -296,16 +364,7 @@ namespace EndorVPN.Core
                 return new ConnectResult { Server = server, ErrorKey = "err.network", Detail = "no config" };
 
             var plan = PickTransport(server, cfgText, settings);
-            if (_preflightFoundTcp == false && plan.Tcp)
-            {
-                // nothing answered on TCP during preflight; do not repeat it
-                plan = new TransportPlan { Tcp = false, Port = 1194 };
-                _log.Info("transport for " + server.Host + ": switching to " + plan + " (no TCP answer)");
-            }
-            else
-            {
-                _log.Info("transport for " + server.Host + ": " + plan);
-            }
+            _log.Info("transport for " + server.Host + ": " + plan);
             return await RunOpenVpnOnceAsync(server, settings, cfgText, plan, ct).ConfigureAwait(false);
         }
 
@@ -322,7 +381,20 @@ namespace EndorVPN.Core
                 return new TransportPlan { Tcp = false, Port = 1194 };
 
             bool tcp = cfgText != null && cfgText.IndexOf("proto tcp", StringComparison.OrdinalIgnoreCase) >= 0;
-            return new TransportPlan { Tcp = tcp, Port = tcp ? 443 : 1194 };
+            int port = 0;
+            if (cfgText != null)
+            {
+                foreach (var line in cfgText.Split('\n'))
+                {
+                    var l = line.Trim();
+                    if (!l.StartsWith("remote ", StringComparison.OrdinalIgnoreCase)) continue;
+                    var parts = l.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length >= 3) int.TryParse(parts[2], out port);
+                    break;
+                }
+            }
+            if (port <= 0) port = tcp ? 443 : 1194;
+            return new TransportPlan { Tcp = tcp, Port = port };
         }
 
         private async Task<ConnectResult> RunOpenVpnOnceAsync(VpnServer server, AppSettings settings, string cfgText, TransportPlan plan, CancellationToken ct)

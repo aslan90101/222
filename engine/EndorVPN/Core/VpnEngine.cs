@@ -121,7 +121,8 @@ namespace EndorVPN.Core
                     if (_cts.IsCancellationRequested) break;
                     if (attemptNo++ >= MaxAttempts) break;
                     Stage(Loc.T("stage.tunnel") + " · " + candidate.Host);
-                    _log.Info("attempt " + attemptNo + ": " + candidate.Host + " (" + candidate.CountryCode + ")");
+                    _log.Info("attempt " + attemptNo + "/" + Math.Min(candidates.Count, MaxAttempts) +
+                              ": " + candidate.Host + " (" + candidate.CountryCode + ")");
                     var attempt = await TryServerAsync(candidate, settings, _cts.Token).ConfigureAwait(false);
                     if (_cancelled)
                     {
@@ -250,11 +251,17 @@ namespace EndorVPN.Core
             long readOffset = 0;
             bool timedOut = false;
 
-            long budget = Math.Max(10, AttemptTimeoutSec) * 1000L;
+            long budget = Math.Max(8, AttemptTimeoutSec) * 1000L;
+            var hostStage = Loc.T("stage.tunnel") + " · " + server.Host;
+            Stage(hostStage);
             while (sw.ElapsedMilliseconds < budget)
             {
                 if (ct.IsCancellationRequested) break;
                 await Task.Delay(220, ct).ConfigureAwait(false);
+
+                // a visible countdown: silence looks like a frozen app
+                int left = (int)Math.Max(0, (budget - sw.ElapsedMilliseconds) / 1000);
+                Stage(hostStage + " · " + left + "s");
 
                 if (_authRejected)
                 {
@@ -285,7 +292,7 @@ namespace EndorVPN.Core
 
             if (!_tunnelUp)
             {
-                timedOut = sw.ElapsedMilliseconds >= budget;
+                timedOut = sw.ElapsedMilliseconds >= budget - 250;
                 res.ErrorKey = classify(_lastLogLine, timedOut);
                 res.Detail = _lastLogLine;
                 StopProcess();
@@ -298,11 +305,15 @@ namespace EndorVPN.Core
 
             var checker = new IpChecker(_log);
             IpInfo info = null;
-            for (int i = 0; i < 3; i++)
+            using (var verifyCts = CancellationTokenSource.CreateLinkedTokenSource(ct))
             {
-                info = await checker.GetAsync(ct).ConfigureAwait(false);
-                if (info != null && info.Ok) break;
-                await Task.Delay(700, ct).ConfigureAwait(false);
+                verifyCts.CancelAfter(TimeSpan.FromSeconds(8));
+                for (int i = 0; i < 2; i++)
+                {
+                    try { info = await checker.GetAsync(verifyCts.Token).ConfigureAwait(false); } catch { }
+                    if (info != null && info.Ok) break;
+                    try { await Task.Delay(500, verifyCts.Token).ConfigureAwait(false); } catch { break; }
+                }
             }
 
             res.Ok = true;
@@ -389,18 +400,10 @@ namespace EndorVPN.Core
             {
                 if (_proc != null && !_proc.HasExited)
                 {
-                    // Ask politely first so OpenVPN removes its routes, then force.
-                    try
-                    {
-                        var psi = new ProcessStartInfo("taskkill", "/PID " + _proc.Id + " /T /F")
-                        {
-                            UseShellExecute = false,
-                            CreateNoWindow = true,
-                        };
-                        Process.Start(psi);
-                    }
-                    catch { }
-                    if (!_proc.WaitForExit(4000)) { try { _proc.Kill(); } catch { } }
+                    // Kill directly: taskkill + a 4 s wait used to keep the UI in
+                    // "Connecting" long after the attempt had already failed.
+                    try { _proc.Kill(); } catch { }
+                    try { _proc.WaitForExit(700); } catch { }
                 }
             }
             catch { }

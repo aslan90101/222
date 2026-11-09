@@ -51,10 +51,21 @@ function Read-NewLog() {
   } finally { $fs.Dispose() }
 }
 
+# 0. wait until the server list is ready.
+#
+# The power button does nothing while the feed is still loading, so clicking
+# immediately produced a flaky run: no attempt was logged and the whole test
+# failed for a reason unrelated to cancelling. Wait for the book first.
+for ($i = 0; $i -lt 60; $i++) {
+  Start-Sleep -Milliseconds 500
+  $l = Read-NewLog
+  if ($l -match "server book: \d+ servers" -and $l -match "render: servers=") { break }
+}
+
 # 1. start connecting
 Invoke-ById "PowerButton" | Out-Null
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
-for ($i = 0; $i -lt 40; $i++) {
+for ($i = 0; $i -lt 60; $i++) {
   Start-Sleep -Milliseconds 500
   if ((Read-NewLog) -match "attempt \d+/\d+: ") { $result.sawAttempt = $true; break }
 }

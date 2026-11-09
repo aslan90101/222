@@ -1,19 +1,17 @@
   Determining projects to restore...
-  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 170 ms).
-D:\a\222\222\engine\EndorVPN\Core\VpnBookSource.cs(103,97): error CS1061: 'List<string>' does not contain a definition for 'Take' and no accessible extension method 'Take' accepting a first argument of type 'List<string>' could be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(188,86): error CS1061: 'string[]' does not contain a definition for 'Count' and no accessible extension method 'Count' accepting a first argument of type 'string[]' could be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+  Restored D:\a\222\222\engine\EndorVPN\EndorVPN.csproj (in 163 ms).
+D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(189,22): error CS0019: Operator '+' cannot be applied to operands of type 'string' and 'method group' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1429,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(223,24): warning CS0649: Field 'VpnEngine.TransportPlan.LatencyMs' is never assigned to, and will always have its default value 0 [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 
 Build FAILED.
 
 D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(1429,24): warning CS0219: The variable 'runKey' is assigned but its value is never used [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
 D:\a\222\222\engine\EndorVPN\Core\VpnEngine.cs(223,24): warning CS0649: Field 'VpnEngine.TransportPlan.LatencyMs' is never assigned to, and will always have its default value 0 [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\VpnBookSource.cs(103,97): error CS1061: 'List<string>' does not contain a definition for 'Take' and no accessible extension method 'Take' accepting a first argument of type 'List<string>' could be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
-D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(188,86): error CS1061: 'string[]' does not contain a definition for 'Count' and no accessible extension method 'Count' accepting a first argument of type 'string[]' could be found (are you missing a using directive or an assembly reference?) [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\MainWindow.xaml.cs(37,22): warning CS0649: Field 'MainWindow._minimizeToTray' is never assigned to, and will always have its default value false [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
+D:\a\222\222\engine\EndorVPN\Core\ServerSource.cs(189,22): error CS0019: Operator '+' cannot be applied to operands of type 'string' and 'method group' [D:\a\222\222\engine\EndorVPN\EndorVPN.csproj]
     3 Warning(s)
-    2 Error(s)
+    1 Error(s)
 
-Time Elapsed 00:00:08.50
+Time Elapsed 00:00:08.11

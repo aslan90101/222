@@ -106,7 +106,13 @@ namespace EndorVPN.Core
             outLines.Add("connect-retry-max 1");
             outLines.Add("connect-timeout " + Math.Max(8, opts.ConnectTimeoutSec));
             outLines.Add("tun-mtu " + opts.TunMtu);
-            outLines.Add("mssfix 1380");
+            outLines.Add("mssfix " + Math.Max(1200, opts.TunMtu - 70));
+            // 64 KB socket buffers cap throughput at ~2 Mbit/s on a 250 ms path
+            // (bandwidth-delay product) and far less once TCP-in-TCP overhead is
+            // added - that was the real reason the app showed ~1 Mbit/s. Ask the
+            // OS for large buffers; Windows may grant less, never more.
+            outLines.Add("sndbuf 524288");
+            outLines.Add("rcvbuf 524288");
             outLines.Add("tls-version-min 1.2");
             outLines.Add("windows-driver " + (opts.UseWintun ? "wintun" : "tap-windows6"));
             if (!opts.UseWintun)

@@ -47,6 +47,9 @@ namespace EndorVPN.Core
         /// <summary>Counts "Waiting for TUN/TAP interface" lines: the adapter is not coming up.</summary>
         private int _routeStuck;
 
+        /// <summary>Transport chosen by the preflight for each server id.</summary>
+        private readonly Dictionary<string, TransportPlan> _plans = new Dictionary<string, TransportPlan>();
+
         private volatile bool _noDnsBlockThisAttempt;
         private volatile bool _tunnelUp;
 
@@ -98,6 +101,7 @@ namespace EndorVPN.Core
             }
             _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             _cancelled = false;
+            lock (_plans) _plans.Clear();
 
             var result = new ConnectResult { Server = server };
             try
@@ -244,7 +248,7 @@ namespace EndorVPN.Core
                     await gate.WaitAsync(ct).ConfigureAwait(false);
                     try
                     {
-                        int ms = await ProbeServerAsync(s, settings, ct).ConfigureAwait(false);
+                        var (ms, _) = await ProbeServerAsync(s, settings, ct).ConfigureAwait(false);
                         return (s, ms);
                     }
                     finally
@@ -264,7 +268,19 @@ namespace EndorVPN.Core
                 _log.Info("probe: " + r.srv.Host + " [" + EndpointOf(r.srv) + "] " +
                           (r.ms >= 0 ? r.ms + " ms" : "no reply"));
 
-            var alive = results.Where(r => r.ms >= 0).OrderBy(r => r.ms).ToList();
+            // Latency alone is a poor speed predictor on volunteer nodes: a 200 ms
+            // node can push 40 Mbit/s while a 150 ms one caps at 2. VPN Gate
+            // publishes its own speed measurement, so rank on that first and use
+            // latency only to break ties.
+            var alive = results.Where(r => r.ms >= 0)
+                               // VPNBook does not publish a speed figure; give it a
+                               // fair mid-rank so it is neither skipped nor always first.
+                               .OrderByDescending(r => r.srv.SpeedBps > 0 ? r.srv.SpeedBps : 5000000)
+                               .ThenBy(r => r.ms)
+                               .ToList();
+            foreach (var r in alive.Take(3))
+                _log.Info("rank: " + r.srv.Host + " " + r.ms + " ms, " +
+                          (r.srv.SpeedBps / 1000000.0).ToString("0.0") + " Mbit/s advertised");
             _log.Info("preflight: " + alive.Count + "/" + results.Length + " candidates answered");
             if (alive.Count == 0)
             {
@@ -293,17 +309,41 @@ namespace EndorVPN.Core
             return srv.Host;
         }
 
-        /// <summary>TCP connect for tcp profiles, UDP handshake probe for udp ones.</summary>
-        private static async Task<int> ProbeServerAsync(VpnServer srv, AppSettings settings, CancellationToken ct)
+        /// <summary>
+        /// Picks the fastest transport that actually answers.
+        ///
+        /// VPN Gate only hands out TCP profiles, but the nodes normally listen on
+        /// UDP as well. TCP-over-TCP caps throughput hard (one loss event stalls the
+        /// whole window), which is why the app measured ~1 Mbit/s. So UDP is tried
+        /// first and used when it answers; the profile's own TCP port stays as the
+        /// fallback, because the custom ports in those profiles are TCP-only.
+        /// </summary>
+        private async Task<(int ms, bool ok)> ProbeServerAsync(VpnServer srv, AppSettings settings, CancellationToken ct)
         {
             var cfgText = ServerSource.DecodeConfig(srv);
-            var plan = PickTransport(srv, cfgText, settings);
+            var basePlan = PickTransport(srv, cfgText, settings);
             string host = EndpointOf(srv);
-            if (string.IsNullOrEmpty(host)) return -1;
+            if (string.IsNullOrEmpty(host)) return (-1, false);
 
-            if (plan.Tcp)
-                return await ProbeTcpAsync(host, plan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
-            return await ProbeUdpAsync(host, plan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
+            if (!basePlan.Tcp)
+            {
+                int direct = await ProbeUdpAsync(host, basePlan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
+                if (direct >= 0) { lock (_plans) _plans[srv.Id] = basePlan; return (direct, true); }
+                return (-1, false);
+            }
+
+            // profile says tcp: check whether the node also serves udp
+            int udp = await ProbeUdpAsync(host, 1194, ProbeTimeoutMs, ct).ConfigureAwait(false);
+            if (udp >= 0)
+            {
+                var udpPlan = new TransportPlan { Tcp = false, Port = 1194 };
+                lock (_plans) _plans[srv.Id] = udpPlan;
+                return (udp, true);
+            }
+
+            int tcp = await ProbeTcpAsync(host, basePlan.Port, ProbeTimeoutMs, ct).ConfigureAwait(false);
+            if (tcp >= 0) lock (_plans) _plans[srv.Id] = basePlan;
+            return (tcp, true);
         }
 
         private const int ProbeTimeoutMs = 1200;
@@ -375,7 +415,9 @@ namespace EndorVPN.Core
             if (string.IsNullOrEmpty(cfgText))
                 return new ConnectResult { Server = server, ErrorKey = "err.network", Detail = "no config" };
 
-            var plan = PickTransport(server, cfgText, settings);
+            TransportPlan plan = null;
+            lock (_plans) _plans.TryGetValue(server.Id, out plan);
+            if (plan == null) plan = PickTransport(server, cfgText, settings);
             _log.Info("transport for " + server.Host + ": " + plan);
             return await RunOpenVpnOnceAsync(server, settings, cfgText, plan, ct).ConfigureAwait(false);
         }

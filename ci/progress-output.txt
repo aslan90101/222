@@ -1,8 +1,8 @@
 distinct hint texts: 9
   Preparing network adapter… · click to cancel
-  Checking which servers answer… · 1/5 · click to cancel
-  Checking which servers answer… · 2/5 · click to cancel
-  Establishing tunnel… · us178.vpnbook.com · click to cancel
+  Checking which servers answer… · 1/3 · click to cancel
+  Checking which servers answer… · 2/3 · click to cancel
+  Checking which servers answer… · 3/3 · click to cancel
   Establishing tunnel… · us178.vpnbook.com · 11s · click to cancel
   Establishing tunnel… · us178.vpnbook.com · 10s · click to cancel
   Configuring routes… · click to cancel

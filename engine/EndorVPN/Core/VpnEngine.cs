@@ -52,6 +52,9 @@ namespace EndorVPN.Core
         /// <summary>Counts "Waiting for TUN/TAP interface" lines: the adapter is not coming up.</summary>
         private int _routeStuck;
 
+        /// <summary>Localization key of the phase openvpn reported most recently.</summary>
+        private volatile string _phase;
+
         /// <summary>Transport chosen by the preflight for each server id.</summary>
         private readonly Dictionary<string, TransportPlan> _plans = new Dictionary<string, TransportPlan>();
 
@@ -89,10 +92,18 @@ namespace EndorVPN.Core
         public TapManager Tap { get { return _tap; } }
 
         /// <summary>How long a single server gets to come up before we move on.</summary>
-        public int AttemptTimeoutSec = 12;
+        public int AttemptTimeoutSec = 11;
 
         /// <summary>Hard cap on attempts in one ConnectAsync call.</summary>
-        public int MaxAttempts = 5;
+        public int MaxAttempts = 3;
+
+        /// <summary>
+        /// Hard ceiling for the whole connect operation, preflight included.
+        /// 3 attempts x 12 s = 36 s, which together with probing fit comfortably
+        /// below this. Without a global cap a slow day produced a minute of
+        /// "Establishing tunnel" before the user saw anything.
+        /// </summary>
+        public int TotalConnectTimeoutSec = 45;
 
         /// <summary>How many ranked servers enter the preflight (cheap, parallel).</summary>
         /// <summary>
@@ -166,10 +177,19 @@ namespace EndorVPN.Core
                 candidates = probed;
 
                 int attemptNo = 0;
+                var connectSw = Stopwatch.StartNew();
                 foreach (var candidate in candidates)
                 {
                     if (_cts.IsCancellationRequested) break;
                     if (attemptNo++ >= MaxAttempts) break;
+                    // stop handing out attempts once the overall deadline is near,
+                    // otherwise a dead country means a minute of spinning
+                    if (connectSw.Elapsed.TotalSeconds > TotalConnectTimeoutSec - 4)
+                    {
+                        _log.Warn("connect: overall deadline reached after " + (int)connectSw.Elapsed.TotalSeconds +
+                                  "s, stopping at attempt " + (attemptNo - 1));
+                        break;
+                    }
                     // The DNS block is a nicety; bringing the interface up is not.
                     // First attempt runs without it so a WFP quirk cannot cost the
                     // whole connection.
@@ -655,6 +675,7 @@ namespace EndorVPN.Core
             // that happened on the VPN Gate node before it.
             _lastLogLine = "";
             _routeStuck = 0;
+            _phase = null;
             var sw = Stopwatch.StartNew();
             long readOffset = 0;
             bool timedOut = false;
@@ -667,9 +688,13 @@ namespace EndorVPN.Core
                 if (ct.IsCancellationRequested) break;
                 await Task.Delay(220, ct).ConfigureAwait(false);
 
-                // a visible countdown: silence looks like a frozen app
+                // a visible countdown: silence looks like a frozen app.
+                // The phase is what tells the user whether it is stuck on the
+                // network, the TLS handshake or the driver.
                 int left = (int)Math.Max(0, (budget - sw.ElapsedMilliseconds) / 1000);
-                Stage(hostStage + " · " + left + "s");
+                string phase = _phase;
+                Stage((string.IsNullOrEmpty(phase) ? hostStage : Loc.T(phase) + " · " + server.Host) +
+                      " · " + left + "s");
 
                 if (_authRejected)
                 {
@@ -758,8 +783,12 @@ namespace EndorVPN.Core
             var s = (line ?? "").ToLowerInvariant();
             if (s.Contains("auth_failed") || s.Contains("auth-failure")) return "err.auth";
             if (s.Contains("cannot open") || s.Contains("all tap-windows") || s.Contains("adapter")) return "err.driver";
+            // The server never answered the control channel: the node is alive on
+            // the port but not serving openvpn, which is a different problem from
+            // our own timeout and deserves its own message.
+            if (s.Contains("server poll timeout") || s.Contains("connection reset")) return "err.silent";
             if (timedOut || s.Contains("timeout")) return "err.timeout";
-            if (s.Contains("tls error") || s.Contains("reset") || s.Contains("network is unreachable")) return "err.network";
+            if (s.Contains("tls error") || s.Contains("network is unreachable")) return "err.network";
             return "err.network";
         }
 
@@ -782,7 +811,12 @@ namespace EndorVPN.Core
                                 _tunnelUp = true;
                             if (line.IndexOf("AUTH_FAILED", StringComparison.OrdinalIgnoreCase) >= 0 ||
                                 line.IndexOf("TLS Error", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                line.IndexOf("FATAL", StringComparison.OrdinalIgnoreCase) >= 0)
+                                line.IndexOf("FATAL", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                // these explain a failure just as well and used to be
+                                // dropped, leaving an empty reason
+                                line.IndexOf("Server poll timeout", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                line.IndexOf("Connection reset", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                line.IndexOf("connect to", StringComparison.OrdinalIgnoreCase) >= 0 && line.IndexOf("failed", StringComparison.OrdinalIgnoreCase) >= 0)
                             {
                                 _lastLogLine = line.Trim();
                                 if (line.IndexOf("AUTH_FAILED", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -792,6 +826,24 @@ namespace EndorVPN.Core
                             // openvpn retries "Waiting for TUN/TAP interface" forever.
                             if (line.IndexOf("Waiting for TUN/TAP interface", StringComparison.OrdinalIgnoreCase) >= 0)
                                 _routeStuck++;
+
+                            // Track the real phase so the UI can say what openvpn is
+                            // actually doing instead of showing a bare countdown for
+                            // the whole attempt.
+                            if (line.IndexOf("Attempting to establish TCP connection", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                line.IndexOf("UDPv4 link remote", StringComparison.OrdinalIgnoreCase) >= 0)
+                                _phase = "stage.phase.connect";
+                            else if (line.IndexOf("TCP connection established", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                     line.IndexOf("Peer Connection Initiated", StringComparison.OrdinalIgnoreCase) >= 0)
+                                _phase = "stage.phase.tls";
+                            else if (line.IndexOf("PUSH_REQUEST", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                     line.IndexOf("AUTH_FAILED", StringComparison.OrdinalIgnoreCase) >= 0)
+                                _phase = "stage.phase.auth";
+                            else if (line.IndexOf("PUSH_REPLY", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                     line.IndexOf("open_tun", StringComparison.OrdinalIgnoreCase) >= 0)
+                                _phase = "stage.phase.tun";
+                            else if (line.IndexOf("TEST ROUTES", StringComparison.OrdinalIgnoreCase) >= 0)
+                                _phase = "stage.phase.routes";
                             var h = LogLine;
                             if (h != null && line.Length > 0) h("  " + line.Trim());
                         }

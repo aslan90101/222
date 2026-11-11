@@ -76,6 +76,12 @@ namespace EndorVPN
             // throughput guards: large socket buffers and MTU-derived mssfix
             Check("config.sndbuf", built.Contains("sndbuf 524288") && built.Contains("rcvbuf 524288"));
             Check("config.mssfix", built.Contains("mssfix "));
+            // The attempt budget and openvpn's own retry budget must fit together:
+            // connect-retry-max x connect-retry plus connect-timeout has to stay
+            // below the per-attempt timeout, otherwise openvpn is killed before it
+            // can report why, and every failure looks like a generic timeout.
+            Check("config.retryBudget", built.Contains("connect-retry-max 2")
+                                     && built.Contains("connect-retry 2"));
             // Country comes from the subdomain prefix so newly published VPNBook
             // gateways work without a release (us16 -> US, de220 -> DE, sg1 -> SG).
             Check("vpnbook.country", VpnBookSource.CountryForTest("us16.vpnbook.com") == "US"
